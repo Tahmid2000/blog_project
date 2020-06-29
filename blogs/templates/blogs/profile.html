@@ -1,0 +1,59 @@
+{% extends 'blogs/base.html' %}
+{% load static %}
+{% block header_body %}
+
+  <!-- Page Header -->
+  <header class="masthead" style="background-image: url({% static 'blogs/images/home-bg.jpg' %})" >
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="site-heading">
+            <h1>Your blogs.</h1>
+            {% if user.is_authenticated %}
+              <span class="subheading">Hello, {{request.user}}. These are your blogs.</span>
+            {% else %}
+              <span class="subheading"></span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  {% for message in messages %}
+    <p>{{message}}</p>
+  {% endfor %}
+  <!-- Main Content -->
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        {% if all_blogs %}
+            {% for blog in all_blogs  %}
+                <div class="post-preview">
+                    <a href="{% url 'blogs:detail' blog.id %}">
+                        <h2 class="post-title">
+                        {{blog.title}}
+                        </h2>
+                        <h3 class="post-subtitle">
+                        {{blog.subject}}
+                        </h3>
+                    </a>
+                    <p class="post-meta">Posted 
+                        on {{blog.pub_date}}
+                    </p>
+                    <div class="d-flex justify-content-end" style="margin-top: -50px;">
+                        <a class="btn btn-primary mr-1" title="Edit" href="{% url 'blogs:blog-update' blog.id %}"><i class="fas fa-edit"></i></a>
+                        <a class="btn btn-danger" title="Delete" href="{% url 'blogs:blog-delete' blog.id %}" ><i class="fas fa-trash-alt"></i></a>
+                    </div>
+                </div>
+                <hr> 
+            {% endfor %}
+        {% else %}
+            <p>You have no blogs posted!</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+{% endblock header_body %}

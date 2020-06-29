@@ -1,0 +1,60 @@
+{% extends 'blogs/base.html' %}
+{% load static %}
+{% block header_body %}
+
+  <!-- Page Header -->
+  <header class="masthead" style="background-image: url({% static 'blogs/images/home-bg.jpg' %})" >
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="site-heading">
+            <h1>Home</h1>
+            {% if user.is_authenticated %}
+              <span class="subheading">Hello, {{request.user}}.</span>
+            {% else %}
+              <span class="subheading">Welcome to Blogs For All!</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  {% for message in messages %}
+    <div class="alert alert-primary" role="alert">
+      {{message}}
+    </div>
+  {% endfor %}
+  <!-- Main Content -->
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        {% if all_blogs %}
+            {% for blog in all_blogs  %}
+                <div class="post-preview">
+                    <a href="{% url 'blogs:detail' blog.id %}">
+                        <h2 class="post-title">
+                        {{blog.title}}
+                        </h2>
+                        <h3 class="post-subtitle">
+                        {{blog.subject}}
+                        </h3>
+                    </a>
+                    <p class="post-meta">Posted by
+                        <a href="#">{{blog.created_by}}</a>
+                        on {{blog.pub_date}}
+                    </p>
+                </div>
+                <hr> 
+            {% endfor %}
+        {% endif %}
+        <!-- Pager -->
+        <div class="clearfix">
+          <a class="btn btn-primary float-right" href="{% url 'blogs:index' %}">All Posts &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock header_body %}

@@ -1,0 +1,38 @@
+{% extends 'blogs/base.html' %}
+{% load static %}
+{% block header_body %}
+<!-- Page Header -->
+  <header class="masthead" style="background-image: url({% static 'blogs/images/post-bg.jpg' %})">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="post-heading">
+            <h1>{{blog.title}}</h1>
+            <h2 class="subheading">{{blog.subject}}</h2>
+            <span class="meta">Posted by
+              <a href="#">{{blog.created_by.username}}</a>
+              on {{blog.pub_date}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Post Content -->
+  <article>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <p>{{blog.body}}</p>
+          {% if user == blog.created_by %}
+            <div class="d-flex justify-content-end">
+                <a class="btn btn-primary mr-1" title="Edit" href="{% url 'blogs:blog-update' blog.id %}"><i class="fas fa-edit"></i></a>
+                <a class="btn btn-danger" title="Delete" href="{% url 'blogs:blog-delete' blog.id %}" ><i class="fas fa-trash-alt"></i></a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </article>
+{% endblock header_body %}

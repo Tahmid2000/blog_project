@@ -1,0 +1,47 @@
+{% extends 'blogs/base.html' %}
+{% load static %}
+{% block header_body %}
+<!-- Page Header -->
+  <header class="masthead" {% comment %} style="background-image: url({% static 'blogs/images/post-bg.jpg' %})" {% endcomment %}>
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="post-heading">
+          <form method="POST" id="contactForm">
+            {% csrf_token %}
+            <div class="control-group" style="margin-top: -50px;">
+              <div class="form-group floating-label-form-group controls">
+                <label style="font-size: 20px;" for="title">Title</label>
+                <h1 style="font-size: 275%;">{{form.title}}</h1>
+              </div>
+            </div>
+            <div class="control-group">
+              <div class="form-group floating-label-form-group controls">
+                <label style="font-size: 20px;" for="title">Subject</label>
+                <h2 style="font-size: 275%;">{{form.subject}}</h2>
+              </div>
+            </div>
+            {% comment %} <h2 class="subheading">{{form.subject}}</h2> {% endcomment %}
+            <span class="meta mt-3">When do you want to post it?
+              {{form.pub_date}}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <!-- Post Content -->
+  <article>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <label for="body">Body</label>
+          <p>{{form.body}}</p>
+          <input type="submit" class="btn btn-primary float-right"></input>
+        </form>
+        </div>
+      </div>
+    </div>
+  </article>
+{% endblock header_body %}

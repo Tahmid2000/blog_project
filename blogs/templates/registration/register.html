@@ -1,0 +1,39 @@
+{% extends 'blogs/base.html' %}
+{% block extra_css %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css" rel="stylesheet">
+{% endblock extra_css %}
+{% block header_body %}
+ <div class="container pt-5">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <div class="card">
+            <div class="card-body px-4">
+                <h1>Register</h1>
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        {{field.label}}:
+                        {{field}}
+                        <br>
+                        <br>
+                    {% endfor %}
+                    {{form.errors}}
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <a href="{% url 'blogs:login' %}" class="btn btn-dark">Already have an account?</a>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex justify-content-end">
+                                <input type="submit" class="btn btn-primary">
+                            </div>
+                        </div>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock header_body %}
+
