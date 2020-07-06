@@ -39,16 +39,14 @@ def author_logout(request):
     return HttpResponseRedirect(reverse('blogs:login'))
 
 
-""" @method_decorator(unauthenticated_user, name='dispatch') """
-
-
 class RegisterAuthor(generic.edit.CreateView):
     template_name = "registration/register.html"
     form_class = UserForm
 
-    """ @method_decorator(unauthenticated_user)
-    def get(request, *args, **kwargs):
-        return super().get(*args, **kwargs) """
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('blogs:home')
+        return super(RegisterAuthor, self).dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
         messages.add_message(self.request, messages.SUCCESS, 'Author created!')

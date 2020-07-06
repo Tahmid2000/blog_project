@@ -4,9 +4,9 @@ from django.contrib.auth import views as auth_views
 app_name = 'blogs'
 urlpatterns = [
     path('', views.HomeView.as_view(), name="home"),
-    path('author/login',
+    path('author/login/',
          auth_views.LoginView.as_view(redirect_authenticated_user=True), name='login'),
-    path('author/logout', auth_views.LogoutView.as_view(), name='logout'),
+    path('author/logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('author/register/', views.RegisterAuthor.as_view(), name="register"),
     path('all/', views.IndexView.as_view(), name='index'),
     path('<int:pk>/', views.DetailView.as_view(), name='detail'),
