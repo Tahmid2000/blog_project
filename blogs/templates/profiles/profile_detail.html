@@ -1,6 +1,6 @@
 {% extends 'blogs/base.html' %}
 {% block title %}
-Profile
+Profile - {{user_profile}}
 {% endblock title %}
 {% block extra_css %}
 {% comment %} <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css" rel="stylesheet"> {% endcomment %}
@@ -15,22 +15,7 @@ Profile
       <div class="row">
         <div class="col-lg-8 col-md-10 mx-auto">
           <div class="site-heading">
-            <h1>Your blogs.</h1>
-            {% if user.is_authenticated %}
-              <span class="subheading">Hello, {{request.user}}. These are your blogs.</span>
-            {% else %}
-              <span class="subheading"></span>
-            {% endif %}
-            <div class="pt-5" style="margin-bottom: -50px;">
-            <div class="card">
-              <div class="card-body" style="padding: 0">
-                {% if user_profile %}
-                <a href="{% url 'blogs:profile-update' user_profile.id %}" >Edit Profile</a>
-                {% else %}
-                <a href="{% url 'blogs:profile-add' user.pk %}" >Edit Profile</a>
-                {% endif %}
-              </div>
-            </div>  
+            <h1>{{user_name}}</h1>
             </div>
           </div>
         </div>
@@ -73,15 +58,11 @@ Profile
                             <p class="post-meta">Posted 
                                 on {{blog.pub_date}}
                             </p>
-                            <div class="d-flex justify-content-end" style="margin-top: -50px;">
-                                <a class="btn btn-primary mr-1" title="Edit" href="{% url 'blogs:blog-update' blog.id %}"><i class="fas fa-edit"></i></a>
-                                <a class="btn btn-danger" title="Delete" href="{% url 'blogs:blog-delete' blog.id %}" ><i class="fas fa-trash-alt"></i></a>
-                            </div>
                         </div>
                         <hr> 
                     {% endfor %}
                 {% else %}
-                    <p>You have no blogs posted!</p>
+                    <p>They have no blogs posted!</p>
                 {% endif %}
               </div>
             </div>

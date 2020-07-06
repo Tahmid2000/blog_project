@@ -9,12 +9,12 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>Blogs for All</title>
-
+  <title>Blogs For All - {% block title %}{% endblock title %}</title>
   <!-- Bootstrap core CSS -->
-  <link href="{% static 'blogs/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
   {% block extra_css %}
   {% endblock extra_css %}
+  <link href="{% static 'blogs/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  
   <!-- Custom fonts for this template -->
   <link href="{% static 'blogs/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
   <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
@@ -41,12 +41,12 @@
           </li>
           
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'blogs:blog-add' %}">Create New Blog</a>
+            <a class="nav-link" href="{% url 'blogs:blog-add' %}">Post New Blog</a>
           </li>
           
           {% if user.is_authenticated %}
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'blogs:profile' %}">Your Profile/Blogs</a>
+              <a class="nav-link" href="{% url 'blogs:profile' user.pk %}">Your Profile/Blogs</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{% url 'blogs:logout' %}">Logout</a>
@@ -102,7 +102,9 @@
 
   <!-- Custom scripts for this template -->
   <script src="{% static 'blogs/js/clean-blog.min.js' %}"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js"></script>
+  {% block js %}
+  {% endblock js %}
+  {% comment %} <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js"></script> {% endcomment %}
 </body>
 
 </html>

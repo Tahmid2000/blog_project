@@ -1,4 +1,7 @@
 {% extends 'blogs/base.html' %}
+{% block title %}
+Home
+{% endblock title %}
 {% load static %}
 {% block header_body %}
 
@@ -44,7 +47,11 @@
                         </h3>
                     </a>
                     <p class="post-meta">Posted by
-                        <a href="#">{{blog.created_by}}</a>
+                        {% if blog.created_by == user %}
+                        <a href="{% url 'blogs:profile' blog.created_by.id%}">{{blog.created_by}}</a>
+                        {% else %}
+                        <a href="{% url 'blogs:profile-detail' blog.created_by.id %}">{{blog.created_by}}</a>
+                        {% endif %}
                         on {{blog.pub_date}}
                     </p>
                 </div>

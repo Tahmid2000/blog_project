@@ -1,45 +1,46 @@
 {% extends 'blogs/base.html' %}
-{% block extra_css %}
-{% endblock extra_css %}
+{% block title %}
+Register
+{% endblock title %}
 {% block header_body %}
 {% load crispy_forms_tags %}
-<nav class="navbar navbar-expand-lg navbar-light bg-dark fixed-top" id="mainNav">
+<nav class="navbar navbar-expand-lg bg-dark fixed-top" id="mainNav">
     <div class="container">
-      <a class="navbar-brand" href="{% url 'blogs:home' %}">Blogs For All</a>
-      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+      <a class="navbar-brand" href="{% url 'blogs:home' %}" style="color: white;">Blogs For All</a>
+      <button class="navbar-toggler navbar-toggler-right bg-dark" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation" style="color:white; border-color: rgba(255,255,255,.1);"">
         Menu
         <i class="fas fa-bars"></i>
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'blogs:home' %}">Home</a>
+            <a class="nav-link" href="{% url 'blogs:home' %}" style="color: white;">Home</a>
           </li>
           
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'blogs:blog-add' %}">Create New Blog</a>
+            <a class="nav-link" href="{% url 'blogs:blog-add' %}" style="color: white;">Create New Blog</a>
           </li>
           
-          {% if user.is_authenticated %}
+          {% comment %} {% if user.is_authenticated %}
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'blogs:profile' %}">Your Profile/Blogs</a>
+              <a class="nav-link" href="{% url 'blogs:profile' %}" style="color: white;">Your Profile/Blogs</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'blogs:logout' %}">Logout</a>
+              <a class="nav-link" href="{% url 'blogs:logout' %}" style="color: white;">Logout</a>
             </li>
-          {% else %}
+          {% else %} {% endcomment %}
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'blogs:register' %}">Register</a>
+              <a class="nav-link" href="{% url 'blogs:register' %}" style="color: white;">Register</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'blogs:login' %}">Login</a>
+              <a class="nav-link" href="{% url 'blogs:login' %}"style="color: white;" >Login</a>
             </li>
-          {% endif %}
+          {% comment %} {% endif %} {% endcomment %}
         </ul>
       </div>
     </div>
   </nav>
-
+  
  <div class="container pt-5" style="margin-top: 100px; margin-bottom: 175px;">
     <div class="row">
       <div class="col-lg-8 col-md-10 mx-auto">
@@ -52,7 +53,7 @@
                     {% comment %} {{form.errors}} {% endcomment %}
                     <div class="row">
                         <div class="col-sm-6">
-                            <a href="{% url 'blogs:login' %}" class="btn btn-dark">Already have an account?</a>
+                            <a href="{% url 'blogs:login' %}" style="font-size: 75%;">Already signed up?</a>
                         </div>
                         <div class="col-sm-6">
                             <div class="d-flex justify-content-end">
