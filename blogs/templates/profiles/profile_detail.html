@@ -3,9 +3,9 @@
 Profile - {{user_profile}}
 {% endblock title %}
 {% block extra_css %}
-{% comment %} <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css" rel="stylesheet"> {% endcomment %}
 {% endblock extra_css %}
 {% load static %}
+{% load blog_extras %}
 {% block header_body %}
 
   <!-- Page Header -->
@@ -51,13 +51,31 @@ Profile - {{user_profile}}
                                 <h2 class="post-title">
                                 {{blog.title}}
                                 </h2>
+                                {% if blog.subject %}
                                 <h3 class="post-subtitle">
                                 {{blog.subject}}
                                 </h3>
+                                {% endif %}
                             </a>
                             <p class="post-meta">Posted 
                                 on {{blog.pub_date}}
                             </p>
+                        </div>
+                        <div class="d-flex justify-content-end" style="margin-top: -50px;">
+                            {% commented_this_blog blog user as commented_this_blog %}
+                            {% if commented_this_blog %}
+                            <span style="color: #0085a1;">
+                            {% else %}
+                            <span>
+                            {% endif %}
+                            <i class="fas fa-comment-alt "></i></span>&thinsp;{{blog.comments.count}}  
+                            {% liked_this_blog blog user.id as liked_this_blog %}
+                            {% if liked_this_blog %}
+                            <span style="color: #dc3545;">
+                            {% else %}
+                            <span>
+                            {% endif %}
+                            <i class="fas fa-heart ml-2"></i></span>&thinsp;{{blog.likes.count}}
                         </div>
                         <hr> 
                     {% endfor %}

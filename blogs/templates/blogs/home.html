@@ -3,10 +3,11 @@
 Home
 {% endblock title %}
 {% load static %}
+{% load blog_extras %}
 {% block header_body %}
 
   <!-- Page Header -->
-  <header class="masthead" style="background-image: url({% static 'blogs/images/home-bg.jpg' %})" >
+  <header class="masthead" style="background-image: url({% static 'blogs/images/blog-home.jpeg' %})" >
     <div class="overlay"></div>
     <div class="container">
       <div class="row">
@@ -42,9 +43,11 @@ Home
                         <h2 class="post-title">
                         {{blog.title}}
                         </h2>
+                        {% if blog.subject %}
                         <h3 class="post-subtitle">
                         {{blog.subject}}
                         </h3>
+                        {% endif %}
                     </a>
                     <p class="post-meta">Posted by
                         {% if blog.created_by == user %}
@@ -55,12 +58,29 @@ Home
                         on {{blog.pub_date}}
                     </p>
                 </div>
+                {% comment %} <br> {% endcomment %}
+                <div class="d-flex justify-content-end" style="margin-top: -50px;">
+                    {% commented_this_blog blog user.id as commented_this_blog %}
+                    {% if commented_this_blog %}
+                    <span style="color: #0085a1;">
+                    {% else %}
+                    <span>
+                    {% endif %}
+                    <i class="fas fa-comment-alt "></i></span>&thinsp;{{blog.comments.count}}  
+                    {% liked_this_blog blog user.id as liked_this_blog %}
+                    {% if liked_this_blog %}
+                    <span style="color: #dc3545;">
+                    {% else %}
+                    <span>
+                    {% endif %}
+                    <i class="fas fa-heart ml-2"></i></span>&thinsp;{{blog.likes.count}}
+                </div>
                 <hr> 
             {% endfor %}
         {% endif %}
         <!-- Pager -->
         <div class="clearfix">
-          <a class="btn btn-primary float-right" href="{% url 'blogs:index' %}">All Posts &rarr;</a>
+          <a class="btn btn-primary float-right" href="{% url 'blogs:index' %}">All Blogs &rarr;</a>
         </div>
       </div>
     </div>

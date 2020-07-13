@@ -13,6 +13,9 @@ Update
     text-decoration: underline;
     transition: .2s;
   }
+  input[type="checkbox"]{
+    display: none;
+  }
  </style>
 {% endblock extra_css %}
 {% block header_body %}
@@ -25,6 +28,7 @@ Update
           <div class="post-heading">
           <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
+            {{form.media}}
             <div class="control-group" style="margin-top: -50px;">
               <div class="form-group floating-label-form-group controls">
                 <label style="font-size: 20px;" for="title">Title</label>
@@ -62,11 +66,18 @@ Update
       <div class="row">
         <div class="col-lg-8 col-md-10 mx-auto">
           <h3>Body</h3>
-          <p>{{form.body}}</p>
+          <p>{{form.body|safe}}</p>
           {{ form.errors }}
           {{ form.non_field_errors }}
-          <a href="{% url 'blogs:profile' user.pk %}" class="btn btn-danger mr-1">Cancel</a>
+          <a href="{% url 'blogs:detail' blog.pk %}" class="btn btn-danger mr-1">Cancel</a>
+          {{form.posted}}
+          {% if blog.posted %}
           <input type="submit" class="btn-primary btn float-right" value="Update"></input>
+          <input type="submit" class="btn-warning btn float-right mr-3" value="Move to Drafts" onclick="addToDrafts()"></input>
+          {% else %}
+          <input type="submit" class="btn-primary btn float-right" value="Make Public" onclick="makePublic()"></input>
+          <input type="submit" class="btn-warning btn float-right mr-3" value="Save Changes"></input>
+          {% endif %}
         </form>
         </div>
       </div>
@@ -74,4 +85,12 @@ Update
   </article>
 {% endblock header_body %}
 {% block js %}
+<script>
+  function makePublic(){
+    document.getElementById("id_posted").checked = true;
+  }
+  function addToDrafts(){
+    document.getElementById("id_posted").checked = false;
+  }
+</script>
 {% endblock js %}

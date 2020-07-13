@@ -19,5 +19,8 @@ urlpatterns = [
     path('author/profile/<int:pk>/update/',
          views.ProfileUpdate.as_view(), name='profile-update'),
     path('author/profile/<int:pk>/view/',
-         views.ProfileDetail.as_view(), name='profile-detail')
+         views.ProfileDetail.as_view(), name='profile-detail'),
+    path('<int:pk>/like/', views.likeBlog, name='like-blog'),
+    path('<int:pk>/like/comment/<int:id>/',
+         views.likeComment, name='like-comment')
 ]

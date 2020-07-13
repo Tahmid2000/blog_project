@@ -15,9 +15,9 @@ Profile
       <div class="row">
         <div class="col-lg-8 col-md-10 mx-auto">
           <div class="site-heading">
-            <h1>Your blogs.</h1>
+            <h1>Your Profile</h1>
             {% if user.is_authenticated %}
-              <span class="subheading">Hello, {{request.user}}. These are your blogs.</span>
+              <span class="subheading">Hello, {{request.user}}.</span>
             {% else %}
               <span class="subheading"></span>
             {% endif %}
@@ -49,6 +49,10 @@ Profile
           <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile"
             aria-selected="false">Profile</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" id="drafts-tab" data-toggle="tab" href="#drafts" role="tab" aria-controls="drafts"
+            aria-selected="false">Drafts</a>
+        </li>
       </ul>
       <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
@@ -66,14 +70,18 @@ Profile
                                 <h2 class="post-title">
                                 {{blog.title}}
                                 </h2>
+                                {% if blog.subject %}
                                 <h3 class="post-subtitle">
                                 {{blog.subject}}
                                 </h3>
+                                {% endif %}
                             </a>
                             <p class="post-meta">Posted 
                                 on {{blog.pub_date}}
                             </p>
+                            {% comment %} <br> {% endcomment %}
                             <div class="d-flex justify-content-end" style="margin-top: -50px;">
+                                <a class="btn btn-warning mr-1" title="Make Private" href="{% url 'blogs:blog-update' blog.id %}"><i class="fas fa-eye-slash"></i></a>
                                 <a class="btn btn-primary mr-1" title="Edit" href="{% url 'blogs:blog-update' blog.id %}"><i class="fas fa-edit"></i></a>
                                 <a class="btn btn-danger" title="Delete" href="{% url 'blogs:blog-delete' blog.id %}" ><i class="fas fa-trash-alt"></i></a>
                             </div>
@@ -124,6 +132,63 @@ Profile
             <br>
             </div>
           </div>
+        </div>
+        <div class="tab-pane fade" id="drafts" role="tabpanel" aria-labelledby="drafts-tab">
+          <!-- Main Content -->
+          <div class="container">
+            <div class="row">
+              <div class="col-lg-8 col-md-10 mx-auto">
+                {% if drafts %}
+                    {% for blog in drafts  %}
+                        <div class="post-preview">
+                            <a href="{% url 'blogs:detail' blog.id %}">
+                                <h2 class="post-title">
+                                {{blog.title}}
+                                </h2>
+                                {% if blog.subject %}
+                                <h3 class="post-subtitle">
+                                {{blog.subject}}
+                                </h3>
+                                {% endif %}
+                            </a>
+                            <p class="post-meta">Posted 
+                                on {{blog.pub_date}}
+                            </p>
+                            {% comment %} <br> {% endcomment %}
+                            <div class="d-flex justify-content-end" style="margin-top: -50px;">
+                                <a class="btn btn-warning mr-1" title="Make Public" href="{% url 'blogs:blog-update' blog.id %}"><i class="fas fa-eye"></i></a>
+                                <a class="btn btn-primary mr-1" title="Edit" href="{% url 'blogs:blog-update' blog.id %}"><i class="fas fa-edit"></i></a>
+                                <a class="btn btn-danger" title="Delete" href="{% url 'blogs:blog-delete' blog.id %}" ><i class="fas fa-trash-alt"></i></a>
+                            </div>
+                        </div>
+                        <hr> 
+                    {% endfor %}
+                {% else %}
+                    <p>You have no drafts.</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% comment %} <div class="d-flex justify-content-center">
+            <div class="pagination">
+              <span class="step-links">
+                  {% if page_obj.has_previous %}
+                      <a href="?page=1" class="btn btn-dark">First</a>
+                      <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-dark">&laquo;</a>
+                  {% endif %}
+
+                  <span class="current">
+                      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                  </span>
+
+                  {% if page_obj.has_next %}
+                      <a href="?page={{ page_obj.next_page_number }}" class="btn btn-dark">&raquo;</a>
+                      <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-dark">Last</a>
+                  {% endif %}
+              </span>
+            </div>
+          </div> {% endcomment %}
+        
         </div>
     </div>
     </div>

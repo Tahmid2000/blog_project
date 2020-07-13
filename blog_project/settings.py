@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'blogs.apps.BlogsConfig',
     'crispy_forms',
     'django_cleanup',
+    'ckeditor'
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -122,13 +123,15 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
-
+CKEDITOR_CONFIGS = {
+    'default': {
+        'width': '100%'
+    }
+}
 STATIC_URL = '/static/'
-
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
-
-
 LOGIN_URL = '/blogs/author/login'
 LOGIN_REDIRECT_URL = 'blogs:home'
 LOGOUT_REDIRECT_URL = 'blogs:home'

@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 import os
 from django.utils.deconstruct import deconstructible
+from ckeditor.fields import RichTextField
 # Create your models here.
 
 
@@ -52,13 +53,17 @@ blog_file_rename = FileRename('images/blogs/', 'blog')
 
 class Blog(models.Model):
     title = models.CharField(max_length=256, unique=True)
-    subject = models.CharField(max_length=256)
-    body = models.TextField()
+    subject = models.CharField(max_length=256, null=True)
+    body = RichTextField()
     pub_date = models.DateTimeField()
+    updated_date = models.DateTimeField(null=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=1)
     blog_image = models.ImageField(
         upload_to=blog_file_rename, default='blogs/images/post-bg.jpg')
+    posted = models.BooleanField(default=1)
+    likes = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, related_name='likes')
 
     def __str__(self):
         return self.title
@@ -68,3 +73,17 @@ class Blog(models.Model):
 
     def get_absolute_url(self):
         return reverse('blogs:detail', kwargs={'pk': self.pk})
+
+
+class Comment(models.Model):
+    blog = models.ForeignKey(
+        Blog, on_delete=models.CASCADE, related_name='comments')
+    body = models.TextField()
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    pub_date = models.DateTimeField(auto_now_add=True)
+    comment_likes = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, related_name='comment_likes')
+
+    def __str__(self):
+        return 'Comment {} by {}'.format(self.body, self.created_by)

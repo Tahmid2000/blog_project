@@ -13,6 +13,9 @@ Create
     color: #0085a1;
     text-decoration: underline;
   }
+  input[type="checkbox"]{
+    display: none;
+  }
  </style>
 {% endblock extra_css %}
 {% block header_body %}
@@ -23,8 +26,9 @@ Create
       <div class="row">
         <div class="col-lg-8 col-md-10 mx-auto">
           <div class="post-heading">
-          <form method="POST" enctype="multipart/form-data">
+          <form method="POST" enctype="multipart/form-data" id="blog-create">
             {% csrf_token %}
+            {{form.media}}
             <div class="control-group" style="margin-top: -50px;">
               <div class="form-group floating-label-form-group controls">
                 <label style="font-size: 20px;" for="title">Title</label>
@@ -47,7 +51,6 @@ Create
           </div>
         </div>
       </div>
-    </div>
   </header>
   <!-- Post Content -->
   <article>
@@ -56,10 +59,12 @@ Create
         <div class="col-lg-8 col-md-10 mx-auto">
           <h3>Body</h3>
           <p>{{form.body}}</p>
-          {{ form.errors }}
-          {{ form.non_field_errors }}
           <a href="{% url 'blogs:profile' user.pk %}" class="btn btn-danger mr-1">Cancel</a>
           <input type="submit" class="btn-primary btn float-right" value="Post"></input>
+          {{form.posted}}
+          <button type="submit" for="id_posted" class="btn-warning btn float-right mr-3" value="" onclick="addToDrafts()">Add to Drafts</button>
+          {{ form.errors }}
+          {{ form.non_field_errors }}
         </form>
         </div>
       </div>
@@ -67,4 +72,9 @@ Create
   </article>
 {% endblock header_body %}
 {% block js %}
+<script>
+  function addToDrafts(){
+    document.getElementById("id_posted").checked = false;
+  }
+</script>
 {% endblock js %}

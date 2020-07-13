@@ -2,7 +2,51 @@
 {% block title %}
 {{blog.title}}
 {% endblock title %}
+{% load blog_extras %}
+{% block extra_css %}
+ <style>
+    #like-button{
+      font-size: 150%;
+    }
+    #like-button label:hover{
+      color: #dc3545;
+      cursor: pointer;
+      transform: scale(1.15);
+    }
+    #like-button-liked{
+      color: #dc3545;
+      font-size: 150%;
+    }
+    #like-button-liked label:hover {
+      cursor: pointer;
+      transform: scale(1.15);
+    }
+    #comment-icon:hover{
+      color: #0085a1;
+      cursor: pointer;
+    }
+    .asteriskField{
+      display: none;
+    }
+    .comment-like-button label:hover{
+      color: #dc3545;
+      cursor: pointer;
+      transform: scale(1.15);
+    }
+    .comment-like-button{
+      color: #212529;
+    }
+    .comment-like-button-liked{
+      color: #dc3545;
+    }
+    .comment-like-button-liked label:hover{
+      cursor: pointer;
+      transform: scale(1.15);
+    }
+ </style>
+{% endblock extra_css %}
 {% load static %}
+{% load crispy_forms_tags %}
 {% block header_body %}
 <!-- Page Header -->
   <header class="masthead" style="background-image: url('{{ blog.blog_image.url}}');">
@@ -12,14 +56,26 @@
         <div class="col-lg-8 col-md-10 mx-auto">
           <div class="post-heading">
             <h1>{{blog.title}}</h1>
+            {% if blog.subject %}
             <h2 class="subheading">{{blog.subject}}</h2>
-            <span class="meta">Posted by
-              {% if blog.created_by == user %}
-              <a href="{% url 'blogs:profile' blog.created_by.id%}">{{blog.created_by}}</a>
-              {% else %}
-              <a href="{% url 'blogs:profile-detail' blog.created_by.id %}">{{blog.created_by}}</a>
+            {% endif %}
+            <span class="meta">
+              {% if blog.posted %}
+                Posted by
+                {% if blog.created_by == user %}
+                <a href="{% url 'blogs:profile' blog.created_by.id%}">{{blog.created_by}}</a>
+                {% else %}
+                <a href="{% url 'blogs:profile-detail' blog.created_by.id %}">{{blog.created_by}}</a>
               {% endif %}
-              on {{blog.pub_date}}</span>
+              {% else %}
+              Posted in Drafts
+              {% endif %}
+              on {{blog.pub_date}}
+              {% if blog.updated_date%}
+              <br>
+              Edited on {{blog.updated_date}}
+              {% endif %}
+              </span>
           </div>
         </div>
       </div>
@@ -31,15 +87,137 @@
     <div class="container">
       <div class="row">
         <div class="col-lg-8 col-md-10 mx-auto">
-          <p>{{blog.body}}</p>
+          <p>{{blog.body|safe}}</p>
           {% if user == blog.created_by %}
-            <div class="d-flex justify-content-end">
+            <div class="d-flex justify-content-end mb-3">
+                {% if blog.posted %}
+                <a class="btn btn-warning mr-1" title="Make Private" href="{% url 'blogs:blog-update' blog.id %}"><i class="fas fa-eye-slash"></i></>
+                {% else %}
+                <a class="btn btn-warning mr-1" title="Make Public" href="{% url 'blogs:blog-update' blog.id %}"><i class="fas fa-eye"></i></>
+                {% endif %}
                 <a class="btn btn-primary mr-1" title="Edit" href="{% url 'blogs:blog-update' blog.id %}"><i class="fas fa-edit"></i></a>
                 <a class="btn btn-danger" title="Delete" href="{% url 'blogs:blog-delete' blog.id %}" ><i class="fas fa-trash-alt"></i></a>
             </div>
           {% endif %}
+          {% if blog.posted %}
+          <hr>
+          <div class="float-right">
+            <div id="like-status"></div>
+            <form action="{% url 'blogs:like-blog' blog.pk %}" method="POST" id="like-form">
+                {% csrf_token %}
+                {% if likedpost %}
+                <span id="like-button-liked" class="like-button-styling">
+                {% else %}
+                <span id="like-button" class="like-button-styling">
+                {% endif %}
+                <label for="like_button"><i class="fas fa-heart"></i> </label></span> <span id="like-count"> {{like_count}}</span>
+                <input style="display: none" type="submit" id="like_button" name="{{blog.pk}}">
+            </form>
+          </div>
+          <div class="card card-comments wow fadeIn mb-3" style="margin-top: 75px;">
+              <div class="card-header font-weight-bold">{{comments.count}} Comments <span class="float-right" id="comment-icon" onclick="focusComment()"><i class="fas fa-comment-alt "></i></span></div>
+                <div class="card-body">
+                  {% if comments %}
+                    {% for comment in comments %}
+                      <div class="media d-block d-md-flex">
+                          <div class="media-body text-center text-md-left ml-md-3 ml-0">
+                              <h5 class="mt-0 font-weight-bold">
+                                {% if blog.created_by == user %}
+                                <a href="{% url 'blogs:profile' comment.created_by.id%}">{{comment.created_by}} </a>
+                                {% else %}
+                                <a href="{% url 'blogs:profile-detail' comment.created_by.id %}">{{comment.created_by}}</a>
+                                {% endif %}
+                                -  <em>  {{comment.pub_date}}</em>
+                              </h5>
+                              {{comment.body}}
+                              <div class="float-right">
+                              <form action="{% url 'blogs:like-comment' blog.pk comment.pk %}" method="POST" id="comment-like-form-{{blog.pk}}-{{comment.pk}}">
+                                  {% csrf_token %}
+                                  {% is_liked comment user.pk as comment_liked_by_user %}
+                                  {% if comment_liked_by_user %}
+                                  <span class="comment-like-button-liked" id="comment-like-button-styling-{{comment.pk}}">
+                                  {% else %}
+                                  <span class="comment-like-button" id="comment-like-button-styling-{{comment.pk}}">
+                                  {% endif %}
+                                  <label for="{{comment.pk}}"  onclick="commentLike({{blog.pk}}, {{comment.pk}})"><i class="fas fa-heart"></i></label> </span> <span class = "comment-count" id = "like-count-{{comment.pk}}" > {{comment.comment_likes.count}} </span>
+                                  <input  style="display: none" type="submit" id="{{comment.pk}}" name="{{comment.pk}}">
+                              </form>
+                              </div>
+                              <hr>
+                          </div>
+                      </div>
+                    {% endfor %}
+                  {% else %}
+                  Be the first to comment!
+                  {% endif %}
+              </div>
+          </div> 
+          <form action="" method="POST">
+              {% csrf_token %}
+              {{form|crispy}}
+              <div class="d-flex justify-content-end">
+                  <input type="submit" class="btn btn-primary" value="post comment">
+              </div>
+            </form>
+            {% endif %}
         </div>
       </div>
     </div>
   </article>
 {% endblock header_body %}
+{% block js %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js"></script>
+<script>
+function focusComment(){
+  document.getElementById("id_body").focus();
+}
+
+ $('#like-form').submit( function(e){
+  e.preventDefault();
+  $.ajax({
+    type:'POST',
+    url: document.getElementById('like-form').getAttribute('action'),
+    dataType: 'json',
+    data: {
+      csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+    },
+    success : function(msg){
+      console.log(msg.status, msg.likedpost, msg.like_change);
+      var number = parseInt($('#like-count').text()) + msg.like_change;
+      document.getElementById('like-count').innerHTML = number;
+      if (msg.likedpost == false){
+        $('.like-button-styling').css('color', '#212529')
+      }
+      else{
+        $('.like-button-styling').css('color', '#dc3545')
+      }
+    },
+  });
+});
+function commentLike(blogID, commentID)
+{
+  $(`#comment-like-form-${blogID}-${commentID}`).one('submit', function(e){
+    e.preventDefault();
+    $.ajax({
+      type:'POST',
+      url: document.getElementById(`comment-like-form-${blogID}-${commentID}`).getAttribute('action'),
+      dataType: 'json',
+      data: {
+        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+      },
+      success : function(msg){
+        console.log(msg.likedpost);
+        var number = parseInt($(`#like-count-${commentID}`).text()) + msg.like_change;
+        document.getElementById(`like-count-${commentID}`).innerHTML = number;
+        if(msg.likedpost == false){
+          $(`#comment-like-button-styling-${commentID}`).css('color', '#212529')
+        }
+        else{
+          $(`#comment-like-button-styling-${commentID}`).css('color', '#dc3545')
+        }
+      },
+    });
+  });
+}
+</script>
+{% endblock js %}
