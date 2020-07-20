@@ -11,8 +11,7 @@
 
   <title>Blogs For All - {% block title %}{% endblock title %}</title>
   <!-- Bootstrap core CSS -->
-  {% block extra_css %}
-  {% endblock extra_css %}
+  
   <link href="{% static 'blogs/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
   
   <!-- Custom fonts for this template -->
@@ -21,7 +20,15 @@
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
   <!-- Custom styles for this template -->
   <link href="{% static 'blogs/css/clean-blog.min.css' %}" rel="stylesheet">
-  
+  <style>
+  html,body{
+    overflow-x: hidden;
+    padding-right: 0 !important;
+  }
+  {% load blog_extras %}
+  {% block extra_css %}
+  {% endblock extra_css %}
+  </style>
   
 </head>
 
@@ -46,10 +53,11 @@
           
           {% if user.is_authenticated %}
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'blogs:profile' user.pk %}">Your Profile</a>
+              {% notif_count user as notifcount %}
+              <a class="nav-link" href="{% url 'blogs:profile' user.pk %}">{{user}} {% if notifcount %} <span class="badge badge-danger" id="notif-count-nav">{{notifcount}}</span>{% endif %}</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'blogs:logout' %}">Logout</a>
+              <a class="nav-link" href="#" onclick="logoutAlert()">Logout</a>
             </li>
           {% else %}
             <li class="nav-item">
@@ -102,9 +110,35 @@
 
   <!-- Custom scripts for this template -->
   <script src="{% static 'blogs/js/clean-blog.min.js' %}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+  <script>
+  function logoutAlert(){
+    const swalWithBootstrapButtons = Swal.mixin({
+			customClass: {
+			confirmButton: 'btn btn-primary z-depth-0',
+			cancelButton: 'btn btn-danger z-depth-0 mr-3'
+			},
+			buttonsStyling: false
+			})
+			
+			swalWithBootstrapButtons.fire({
+			title: 'Logout',
+			text: `Are you sure you want to logout?`,
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonText: 'Logout',
+			cancelButtonText: 'Cancel',
+			reverseButtons: true
+			}).then((result) => {
+				if (result.value) {
+					event.preventDefault();
+          window.location.href = "{% url 'blogs:logout' %}";
+				}
+		})
+  }
+  </script>
   {% block js %}
   {% endblock js %}
-  {% comment %} <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js"></script> {% endcomment %}
 </body>
 
 </html>

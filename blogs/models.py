@@ -7,6 +7,8 @@ from django.conf import settings
 import os
 from django.utils.deconstruct import deconstructible
 from ckeditor.fields import RichTextField
+from hitcount.models import HitCountMixin, HitCount
+from django.contrib.contenttypes.fields import GenericRelation
 # Create your models here.
 
 
@@ -35,7 +37,7 @@ class UserProfileInfo(models.Model):
     created_by = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     bio = models.TextField()
-    interests = models.TextField()
+    interests = models.CharField(max_length=256)
     profile_pic = models.ImageField(
         upload_to=profile_pic_rename, default="blogs/images/home-bg.jpg")
     twitter = models.URLField(default=None, max_length=256)
@@ -64,6 +66,8 @@ class Blog(models.Model):
     posted = models.BooleanField(default=1)
     likes = models.ManyToManyField(
         settings.AUTH_USER_MODEL, related_name='likes')
+    hit_count_generic = GenericRelation(HitCount, object_id_field='object_pk',
+                                        related_query_name='hit_count_generic_relation')
 
     def __str__(self):
         return self.title
@@ -87,3 +91,18 @@ class Comment(models.Model):
 
     def __str__(self):
         return 'Comment {} by {}'.format(self.body, self.created_by)
+
+
+class Notification(models.Model):
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=1, related_name='sender')
+    receiver = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=1, related_name='receiver')
+    blog = models.ForeignKey(
+        Blog, on_delete=models.CASCADE, related_name='notifications', null=True)
+    content = models.CharField(max_length=256, null=True)
+
+    pub_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.content

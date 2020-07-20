@@ -4,6 +4,7 @@ All Blogs
 {% endblock title %}
 {% load static %}
 {% load blog_extras %}
+{% load hitcount_tags %}
 {% block header_body %}
 
   <!-- Page Header -->
@@ -24,6 +25,15 @@ All Blogs
   <div class="container">
     <div class="row">
       <div class="col-lg-8 col-md-10 mx-auto">
+      <form method="GET">
+      <div class="control-group">
+        <div class="form-group floating-label-form-group controls">
+          <label for="search">Search All Blogs</label>
+          <input type="text" style="width: 100%;" name="q" value="{{request.GET.q}}" class="form-control" id="search" placeholder="Search All Blogs">
+          <input type="submit" class="btn btn-primary" value="Search" style="display: none;">
+        </div>
+      </div>
+      </form>
         {% if all_blogs %}
             {% for blog in all_blogs  %}
                 <div class="post-preview">
@@ -31,9 +41,11 @@ All Blogs
                         <h2 class="post-title">
                         {{blog.title}}
                         </h2>
+                        {% if blog.subject %}
                         <h3 class="post-subtitle">
                         {{blog.subject}}
                         </h3>
+                        {% endif %}
                     </a>
                     <p class="post-meta">Posted by
                         {% if blog.created_by == user %}
@@ -59,6 +71,7 @@ All Blogs
                     <span>
                     {% endif %}
                     <i class="fas fa-heart ml-2"></i></span>&thinsp;{{blog.likes.count}}
+                    <span class="ml-2"><i class="fas fa-eye"></i>&thinsp;{% get_hit_count for blog %}</span>
                 </div>
                 <hr> 
             {% endfor %}
@@ -71,17 +84,16 @@ All Blogs
     <div class="pagination">
       <span class="step-links">
           {% if page_obj.has_previous %}
-              <a href="?page=1" class="btn btn-dark">First</a>
-              <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-dark">&laquo;</a>
+              <a href="?page=1{% if request.GET.q %}&q={{request.GET.q}}{% endif %}" class="btn btn-dark">First</a>
+              <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{request.GET.q}}{% endif %}" class="btn btn-dark">&laquo;</a>
           {% endif %}
 
           <span class="current">
               Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
           </span>
-
           {% if page_obj.has_next %}
-              <a href="?page={{ page_obj.next_page_number }}" class="btn btn-dark">&raquo;</a>
-              <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-dark">Last</a>
+              <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{request.GET.q}}{% endif %}" class="btn btn-dark">&raquo;</a>
+              <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{request.GET.q}}{% endif %}" class="btn btn-dark">Last</a>
           {% endif %}
       </span>
     </div>

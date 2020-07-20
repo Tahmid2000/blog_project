@@ -4,6 +4,7 @@ Home
 {% endblock title %}
 {% load static %}
 {% load blog_extras %}
+{% load hitcount_tags %}
 {% block header_body %}
 
   <!-- Page Header -->
@@ -74,6 +75,7 @@ Home
                     <span>
                     {% endif %}
                     <i class="fas fa-heart ml-2"></i></span>&thinsp;{{blog.likes.count}}
+                    <span class="ml-2"><i class="fas fa-eye"></i>&thinsp;{% get_hit_count for blog %}</span>
                 </div>
                 <hr> 
             {% endfor %}

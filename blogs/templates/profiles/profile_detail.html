@@ -5,6 +5,7 @@ Profile - {{user_profile}}
 {% block extra_css %}
 {% endblock extra_css %}
 {% load static %}
+{% load hitcount_tags %}
 {% load blog_extras %}
 {% block header_body %}
 
@@ -16,11 +17,25 @@ Profile - {{user_profile}}
         <div class="col-lg-8 col-md-10 mx-auto">
           <div class="site-heading">
             <h1>{{user_name}}</h1>
+            <div class="pt-5" style="margin-bottom: -10%; color: #212529;">
+              <div class="d-flex justify-content-center">
+                <div class="card" style="width: 30rem;">
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-sm-4">Followers: 0</div>
+                      <div class="col-sm-4">Blogs: {{blogs_count}}</div>
+                      <div class="col-sm-4">Likes: {{like_count}}</div>
+                    </div>
+                  </div>
+                </div>  
+              </div>
+            </div>
+          </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    
   </header>
 
   
@@ -76,6 +91,7 @@ Profile - {{user_profile}}
                             <span>
                             {% endif %}
                             <i class="fas fa-heart ml-2"></i></span>&thinsp;{{blog.likes.count}}
+                            <span class="ml-2"><i class="fas fa-eye"></i>&thinsp;{% get_hit_count for blog %}</span>
                         </div>
                         <hr> 
                     {% endfor %}

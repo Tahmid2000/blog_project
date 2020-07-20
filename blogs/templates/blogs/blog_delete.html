@@ -42,7 +42,7 @@ Delete
           <form method="post">{% csrf_token %}
             <p>Are you sure you want to delete "{{ object }}"? This cannot be reversed.</p>
             <div class="d-flex justify-content-center">
-                <a href="{% url 'blogs:profile' user.pk %}" class="btn btn-danger mr-1">Cancel</a>
+                <a href="{% url 'blogs:detail' object.pk %}" class="btn btn-danger mr-1">Cancel</a>
                 <input type="submit" value="Confirm" class="btn btn-primary">
             </div>
         </form>

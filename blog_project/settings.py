@@ -41,10 +41,15 @@ INSTALLED_APPS = [
     'blogs.apps.BlogsConfig',
     'crispy_forms',
     'django_cleanup',
-    'ckeditor'
+    'ckeditor',
+    'django_filters',
+    'hitcount',
+    'notifications',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+SWEETIFY_SWEETALERT_LIBRARY = 'sweetalert2'
+HITCOUNT_KEEP_HIT_ACTIVE = {'days': 1}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

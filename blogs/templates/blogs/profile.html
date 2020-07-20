@@ -3,8 +3,18 @@
 Profile
 {% endblock title %}
 {% block extra_css %}
-{% comment %} <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css" rel="stylesheet"> {% endcomment %}
+  .delete-notif{
+    font-size: 150%;
+    opacity: .5;
+  }
+.delete-notif label:hover{
+      opacity: 1 important!;
+      color: #dc3545;
+      cursor: pointer;
+      transform: scale(1.15);
+    }
 {% endblock extra_css %}
+{% load blog_extras %}
 {% load static %}
 {% block header_body %}
 
@@ -21,16 +31,29 @@ Profile
             {% else %}
               <span class="subheading"></span>
             {% endif %}
-            <div class="pt-5" style="margin-bottom: -50px;">
-            <div class="card">
-              <div class="card-body" style="padding: 0">
-                {% if user_profile %}
-                <a href="{% url 'blogs:profile-update' user_profile.id %}" >Edit Profile</a>
-                {% else %}
-                <a href="{% url 'blogs:profile-add' user.pk %}" >Edit Profile</a>
-                {% endif %}
+            <div class="pt-5">
+              <div class="card">
+                <div class="card-body" style="padding: 0">
+                  {% if user_profile %}
+                  <a href="{% url 'blogs:profile-update' user_profile.id %}" >Edit Profile</a>
+                  {% else %}
+                  <a href="{% url 'blogs:profile-add' user.pk %}" >Edit Profile</a>
+                  {% endif %}
+                </div>
+              </div>  
+            </div>
+            <div class="pt-5" style="margin-bottom: -20%; color: #212529;">
+              <div class="d-flex justify-content-center">
+                <div class="card" style="width: 30rem;">
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-sm-4">Followers: 0</div>
+                      <div class="col-sm-4">Blogs: {{blogs_count}}</div>
+                      <div class="col-sm-4">Likes: {{like_count}}</div>
+                    </div>
+                  </div>
+                </div>  
               </div>
-            </div>  
             </div>
           </div>
         </div>
@@ -52,6 +75,14 @@ Profile
         <li class="nav-item">
           <a class="nav-link" id="drafts-tab" data-toggle="tab" href="#drafts" role="tab" aria-controls="drafts"
             aria-selected="false">Drafts</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="likes-tab" data-toggle="tab" href="#likes" role="tab" aria-controls="likes"
+            aria-selected="false">Likes</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="notifications-tab" data-toggle="tab" href="#notifications" role="tab" aria-controls="notifications"
+            aria-selected="false">Notifications {% if notifs.count %}<span class="badge badge-danger" id="notif-count">{{notifs.count}}</span>{% endif %}</a>
         </li>
       </ul>
       <div class="tab-content" id="myTabContent">
@@ -76,7 +107,7 @@ Profile
                                 </h3>
                                 {% endif %}
                             </a>
-                            <p class="post-meta">Posted 
+                            <p class="post-meta">Posted by
                                 on {{blog.pub_date}}
                             </p>
                             {% comment %} <br> {% endcomment %}
@@ -190,6 +221,137 @@ Profile
           </div> {% endcomment %}
         
         </div>
+        <div class="tab-pane fade" id="likes" role="tabpanel" aria-labelledby="likes-tab">
+          <!-- Main Content -->
+          <div class="container">
+            <div class="row">
+              <div class="col-lg-8 col-md-10 mx-auto">
+                {% if likes %}
+                    {% for blog in likes  %}
+                        <div class="post-preview">
+                            <a href="{% url 'blogs:detail' blog.id %}">
+                                <h2 class="post-title">
+                                {{blog.title}}
+                                </h2>
+                                {% if blog.subject %}
+                                <h3 class="post-subtitle">
+                                {{blog.subject}}
+                                </h3>
+                                {% endif %}
+                            </a>
+                            <p class="post-meta">Posted by
+                                {% if blog.created_by == user %}
+                                <a href="{% url 'blogs:profile' blog.created_by.id%}">{{blog.created_by}}</a>
+                                {% else %}
+                                <a href="{% url 'blogs:profile-detail' blog.created_by.id %}">{{blog.created_by}}</a>
+                                {% endif %}
+                                on {{blog.pub_date}}
+                            </p>
+                            {% comment %} <br> {% endcomment %}
+                            {% if user == blog.created_by %}
+                            <div class="d-flex justify-content-end mb-3" style="margin-top: -50px;">
+                                {% if blog.posted %}
+                                <a class="btn btn-warning mr-1" title="Make Private" href="{% url 'blogs:blog-update' blog.id %}"><i class="fas fa-eye-slash"></i>
+                                {% else %}
+                                <a class="btn btn-warning mr-1" title="Make Public" href="{% url 'blogs:blog-update' blog.id %}"><i class="fas fa-eye"></i>
+                                {% endif %}
+                                <a class="btn btn-primary mr-1" title="Edit" href="{% url 'blogs:blog-update' blog.id %}"><i class="fas fa-edit"></i></a>
+                                <a class="btn btn-danger" title="Delete" href="{% url 'blogs:blog-delete' blog.id %}" ><i class="fas fa-trash-alt"></i></a>
+                            </div>
+                          {% endif %}
+                        </div>
+                        <hr> 
+                    {% endfor %}
+                {% else %}
+                    <p>You have no drafts.</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% comment %} <div class="d-flex justify-content-center">
+            <div class="pagination">
+              <span class="step-links">
+                  {% if page_obj.has_previous %}
+                      <a href="?page=1" class="btn btn-dark">First</a>
+                      <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-dark">&laquo;</a>
+                  {% endif %}
+
+                  <span class="current">
+                      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                  </span>
+
+                  {% if page_obj.has_next %}
+                      <a href="?page={{ page_obj.next_page_number }}" class="btn btn-dark">&raquo;</a>
+                      <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-dark">Last</a>
+                  {% endif %}
+              </span>
+            </div>
+          </div> {% endcomment %}
+        
+        </div>
+        <div class="tab-pane fade" id="notifications" role="tabpanel" aria-labelledby="notifications-tab">
+          <!-- Main Content -->
+          <div class="container">
+            <div class="row">
+              <div class="col-lg-8 col-md-10 mx-auto">
+                <div class = "card card-comments wow fadeIn mb-3 mt-3" >
+                <div class = "card-body" id="notification-card-body">
+                  {% if notifs %}
+                    {% for notif in notifs %}
+                      <div class="media d-block d-md-flex" id="{{notif.pk}}">
+                          <div class = "media-body text-center text-md-left ml-md-3 ml-0" >
+                              <h5 class="mt-0 font-weight-bold">
+                                <a href="{% url 'blogs:profile-detail' notif.sender.id %}">{{notif.sender}}</a> {{notif.content}} <a href="{% url 'blogs:detail' notif.blog.id %}">{{notif.blog.title}}</a>
+                              </h5 >
+                              {{notif.pub_date}}
+                              <form action="{% url 'blogs:delete-notif' notif.pk%}" method="POST" id='delete-notif-form-{{notif.pk}}'>
+                                {% csrf_token %}
+                                <span class="float-right delete-notif mr-2"><label for="delete-notify-button-{{notif.pk}}" onclick="deleteNotif({{notif.pk}})"><i class="fas fa-times"></i></label></span>
+                                <input type="submit" style="display: none" id="delete-notify-button-{{notif.pk}}" name="delete-notif">
+                              </form>
+                          </div >
+                      </div >
+                    {% endfor %}
+                  {% else %}
+                  No notifications.
+                  {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
     </div>
     </div>
 {% endblock header_body %}
+{% block js %}
+<script>
+  function deleteNotif(id){
+    console.log(id);
+    $(`#delete-notif-form-${id}`).one('submit', function(e){
+      e.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: document.getElementById(`delete-notif-form-${id}`).getAttribute('action'),
+        dataType: 'json',
+        data: {
+          csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+        },
+        success: function(msg){
+          var number = parseInt($('#notif-count').text()) - 1;
+          document.getElementById(id).remove();
+          if (number !== 0)
+          {
+            
+            document.getElementById('notif-count').innerHTML = number;
+            document.getElementById('notif-count-nav').innerHTML = number;
+          }
+          else {
+            document.getElementById('notification-card-body').innerHTML = "No notifications.";
+            document.getElementById('notif-count').remove();
+            document.getElementById('notif-count-nav').remove();
+          }
+        }
+      })
+    });
+  }
+</script>
+{% endblock js %}

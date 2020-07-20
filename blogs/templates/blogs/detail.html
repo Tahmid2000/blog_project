@@ -43,6 +43,11 @@
       cursor: pointer;
       transform: scale(1.15);
     }
+    .trash-button:hover{
+      cursor: pointer;
+      transform: scale(1.15);
+      color: #0085a1;
+    }
  </style>
 {% endblock extra_css %}
 {% load static %}
@@ -122,27 +127,36 @@
                       <div class="media d-block d-md-flex">
                           <div class="media-body text-center text-md-left ml-md-3 ml-0">
                               <h5 class="mt-0 font-weight-bold">
-                                {% if blog.created_by == user %}
+                                {% if comment.created_by == user %}
                                 <a href="{% url 'blogs:profile' comment.created_by.id%}">{{comment.created_by}} </a>
                                 {% else %}
                                 <a href="{% url 'blogs:profile-detail' comment.created_by.id %}">{{comment.created_by}}</a>
                                 {% endif %}
                                 -  <em>  {{comment.pub_date}}</em>
+                                {% if comment.created_by == user%}
+                                <div class="float-right trash-button" style="font-size: 90%;" >
+                                  <span title="Delete" onclick="deleteComment(`{% url 'blogs:delete-comment' blog.pk comment.pk %}`)"><i class="fas fa-trash"></i></span>
+                                </div>
+                                {% endif %}
                               </h5>
+                              
                               {{comment.body}}
+                              
                               <div class="float-right">
-                              <form action="{% url 'blogs:like-comment' blog.pk comment.pk %}" method="POST" id="comment-like-form-{{blog.pk}}-{{comment.pk}}">
-                                  {% csrf_token %}
-                                  {% is_liked comment user.pk as comment_liked_by_user %}
-                                  {% if comment_liked_by_user %}
-                                  <span class="comment-like-button-liked" id="comment-like-button-styling-{{comment.pk}}">
-                                  {% else %}
-                                  <span class="comment-like-button" id="comment-like-button-styling-{{comment.pk}}">
-                                  {% endif %}
-                                  <label for="{{comment.pk}}"  onclick="commentLike({{blog.pk}}, {{comment.pk}})"><i class="fas fa-heart"></i></label> </span> <span class = "comment-count" id = "like-count-{{comment.pk}}" > {{comment.comment_likes.count}} </span>
-                                  <input  style="display: none" type="submit" id="{{comment.pk}}" name="{{comment.pk}}">
-                              </form>
+                                <form action="{% url 'blogs:like-comment' blog.pk comment.pk %}" method="POST" id="comment-like-form-{{blog.pk}}-{{comment.pk}}">
+                                    {% csrf_token %}
+                                    {% is_liked comment user.pk as comment_liked_by_user %}
+                                    <span class = "comment-count" id = "like-count-{{comment.pk}}" > {{comment.comment_likes.count}} </span>
+                                    {% if comment_liked_by_user %}
+                                    <span class="comment-like-button-liked" id="comment-like-button-styling-{{comment.pk}}">
+                                    {% else %}
+                                    <span class="comment-like-button" id="comment-like-button-styling-{{comment.pk}}">
+                                    {% endif %}
+                                    <label title="Like" for="{{comment.pk}}"  onclick="commentLike({{blog.pk}}, {{comment.pk}})"><i class="fas fa-heart"></i></label> </span> 
+                                    <input  style="display: none" type="submit" id="{{comment.pk}}" name="{{comment.pk}}">
+                                </form>
                               </div>
+                              
                               <hr>
                           </div>
                       </div>
@@ -206,7 +220,6 @@ function commentLike(blogID, commentID)
         csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
       },
       success : function(msg){
-        console.log(msg.likedpost);
         var number = parseInt($(`#like-count-${commentID}`).text()) + msg.like_change;
         document.getElementById(`like-count-${commentID}`).innerHTML = number;
         if(msg.likedpost == false){
@@ -219,5 +232,34 @@ function commentLike(blogID, commentID)
     });
   });
 }
+</script>
+
+<script>
+
+function deleteComment(deleteUrl){
+  const swalWithBootstrapButtons = Swal.mixin({
+			customClass: {
+			confirmButton: 'btn btn-danger z-depth-0',
+			cancelButton: 'btn btn-primary z-depth-0 mr-3'
+			},
+			buttonsStyling: false
+			})
+			
+			swalWithBootstrapButtons.fire({
+			title: 'Are you sure you want to delete this comment?',
+			text: `This can't be reversed.`,
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonText: 'Delete',
+			cancelButtonText: 'Cancel',
+			reverseButtons: true
+			}).then((result) => {
+				if (result.value) {
+					event.preventDefault();
+          window.location.href = deleteUrl;
+				}
+		})
+  }
+
 </script>
 {% endblock js %}

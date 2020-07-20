@@ -22,5 +22,10 @@ urlpatterns = [
          views.ProfileDetail.as_view(), name='profile-detail'),
     path('<int:pk>/like/', views.likeBlog, name='like-blog'),
     path('<int:pk>/like/comment/<int:id>/',
-         views.likeComment, name='like-comment')
+         views.likeComment, name='like-comment'),
+    path(
+        '<int:pk>/delete/comment/<int:id>', views.deleteComment, name='delete-comment'),
+    path('search/', views.searchBlogs, name='search'),
+    path('profile/delete/notif/<int:pk>',
+         views.deleteNotif, name='delete-notif')
 ]

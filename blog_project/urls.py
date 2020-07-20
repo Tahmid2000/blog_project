@@ -18,10 +18,14 @@ from django.urls import path, include
 import blogs.views
 from django.conf import settings  # add this
 from django.conf.urls.static import static  # add this
+import notifications.urls
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', blogs.views.HomeView.as_view(), name="home"),
     path('blogs/', include('blogs.urls'), name='blogs'),
+    path('hitcount/', include(('hitcount.urls', 'hitcount'), namespace='hitcount')),
+    path('inbox/notifications/',
+         include(notifications.urls, namespace='notifications'))
 ]
 
 if settings.DEBUG:  # add this
