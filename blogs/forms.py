@@ -28,8 +28,6 @@ class UserProfileForm(forms.ModelForm):
     profile_pic = forms.ImageField(required=False, error_messages={
         'invalid': ("Image files only")}, widget=forms.FileInput)
 
-
-
     class Meta:
         model = UserProfileInfo
         fields = ['bio', 'interests', 'profile_pic', 'twitter', 'portfolio']

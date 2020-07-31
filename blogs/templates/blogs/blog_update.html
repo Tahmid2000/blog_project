@@ -4,28 +4,30 @@ Update
 {% endblock title %}
 {% load static %}
 {% block extra_css %}
- <style>
-  input[type="file"]{
+<style>
+  input[type="file"] {
     display: none;
   }
-  label[for="id_blog_image"]:hover{
+
+  label[for="id_blog_image"]:hover {
     color: #0085a1;
     text-decoration: underline;
     transition: .2s;
   }
-  input[type="checkbox"]{
+
+  input[type="checkbox"] {
     display: none;
   }
- </style>
+</style>
 {% endblock extra_css %}
 {% block header_body %}
 <!-- Page Header -->
-  <header class="masthead" style = "background-image: url('{{ blog.blog_image.url}}');">
-    <div class="overlay"></div>
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8 col-md-10 mx-auto">
-          <div class="post-heading">
+<header class="masthead" style="background-image: url('{{ blog.blog_image.url}}');">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <div class="post-heading">
           <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             {{form.media}}
@@ -42,54 +44,59 @@ Update
               </div>
             </div>
             <div class="d-flex justify-content-center">
-                <div class="mt-4" style="margin-bottom: -100px;">
+              <div class="mt-4" style="margin-bottom: -100px;">
                 <div class="card">
-                <div class="card-body" style="padding: 0 12px 0 0;">
-                  <label for="id_blog_image" class="btn" style="font-size: 175%;" title="Upload Cover Image"><i class="fas fa-file-image"></i></label>
-                  {{form.blog_image}}
-                  {% if blog.blog_image %}
+                  <div class="card-body" style="padding: 0 12px 0 0;">
+                    <label for="id_blog_image" class="btn" style="font-size: 175%;" title="Upload Cover Image"><i
+                        class="fas fa-file-image"></i></label>
+                    <div style="display: none">
+                      {{form.blog_image}}
+                    </div>
+                    {% if blog.blog_image %}
                     <a href="{{blog.blog_image.url}}">Current Image</a>
-                  {% endif %}
-                  </div>
+                    {% endif %}
                   </div>
                 </div>
+              </div>
             </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
-  </header>
-  <!-- Post Content -->
-  <article>
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8 col-md-10 mx-auto">
-          <h3>Body</h3>
-          <p>{{form.body|safe}}</p>
-          {{ form.errors }}
-          {{ form.non_field_errors }}
-          <a href="{% url 'blogs:detail' blog.pk %}" class="btn btn-danger mr-1">Cancel</a>
-          {{form.posted}}
-          {% if blog.posted %}
-          <input type="submit" class="btn-primary btn float-right" value="Update"></input>
-          <input type="submit" class="btn-warning btn float-right mr-3" value="Move to Drafts" onclick="addToDrafts()"></input>
-          {% else %}
-          <input type="submit" class="btn-primary btn float-right" value="Make Public" onclick="makePublic()"></input>
-          <input type="submit" class="btn-warning btn float-right mr-3" value="Save Changes"></input>
-          {% endif %}
+  </div>
+  </div>
+</header>
+<!-- Post Content -->
+<article>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <h3>Body</h3>
+        <p>{{form.body|safe}}</p>
+        {{ form.errors }}
+        {{ form.non_field_errors }}
+        <a href="{% url 'blogs:detail' blog.pk %}" class="btn btn-danger mr-1">Cancel</a>
+        {{form.posted}}
+        {% if blog.posted %}
+        <input type="submit" class="btn-primary btn float-right" value="Update"></input>
+        <input type="submit" class="btn-warning btn float-right mr-3" value="Move to Drafts"
+          onclick="addToDrafts()"></input>
+        {% else %}
+        <input type="submit" class="btn-primary btn float-right" value="Make Public" onclick="makePublic()"></input>
+        <input type="submit" class="btn-warning btn float-right mr-3" value="Save Changes"></input>
+        {% endif %}
         </form>
-        </div>
       </div>
     </div>
-  </article>
+  </div>
+</article>
 {% endblock header_body %}
 {% block js %}
 <script>
-  function makePublic(){
+  function makePublic() {
     document.getElementById("id_posted").checked = true;
   }
-  function addToDrafts(){
+
+  function addToDrafts() {
     document.getElementById("id_posted").checked = false;
   }
 </script>

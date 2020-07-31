@@ -2,144 +2,347 @@
 {% block title %}
 Profile - {{user_profile}}
 {% endblock title %}
-{% block extra_css %}
-{% endblock extra_css %}
 {% load static %}
 {% load hitcount_tags %}
 {% load blog_extras %}
+{% block extra_css %}
+.modal-dialog{
+    overflow-y: initial !important;
+}
+.modal-body{
+    height: 500px;
+    overflow-y: auto;
+}
+{% endblock extra_css %}
 {% block header_body %}
 
-  <!-- Page Header -->
-  <header class="masthead" style="background-image: url('{{ user_profile.profile_pic.url}}');" >
-    <div class="overlay"></div>
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8 col-md-10 mx-auto">
-          <div class="site-heading">
-            <h1>{{user_name}}</h1>
-            <div class="pt-5" style="margin-bottom: -10%; color: #212529;">
-              <div class="d-flex justify-content-center">
-                <div class="card" style="width: 30rem;">
-                  <div class="card-body">
-                    <div class="row">
-                      <div class="col-sm-4">Followers: 0</div>
-                      <div class="col-sm-4">Blogs: {{blogs_count}}</div>
-                      <div class="col-sm-4">Likes: {{like_count}}</div>
+<!-- Page Header -->
+<header class="masthead" style="background-image: url('{{ user_profile.profile_pic.url}}');">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <div class="site-heading">
+          <h1>{{user_name}}</h1>
+          {% isFollowing user_detail user as is_following %}
+          {% if is_following %}
+          <div style="margin-top: -1px; margin-bottom: -20px;">
+            <span class="badge badge-dark" style="opacity: .75; font-size: 100%;">Follows You</span>
+          </div>
+          {% endif %}
+          <div class="pt-5" style="color: #212529;">
+            <div class="d-flex justify-content-center">
+              <div class="card" style="width: 40rem;">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-sm-3"><a href="" data-toggle="modal" data-target="#followers">Followers</a>:
+                      <span id="followers-count">{{followers.count}}</span></div>
+                    <div class="col-sm-3"><a href="" data-toggle="modal" data-target="#following">Following</a>:
+                      <span id="following-count">{{following.count}}</span></div>
+                    <div class="col-sm-3">Blogs: {{blogs_count}}</div>
+                    <div class="col-sm-3">Likes: {{like_count}}</div>
+                  </div>
+                  <div class="modal fade" id="followers" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel">Followers</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body" id="follower-modal">
+                          {% for follower in followers %}
+                          <div class="float-left">
+                            <a href="{% url 'blogs:profile-detail' follower.follower.id %}" class="float-left"
+                            id="follower-link-{{follower.follower.pk}}">{{follower.follower}}</a><br>
+                            {% isFollowing follower.follower user as is_following %}
+                            {% if is_following %}
+                            <div class="float-left">
+                              <span class="badge badge-dark" style="opacity: .75; font-size: 75%;">Follows You</span>
+                            </div>
+                            {% endif %}
+                          </div>
+                          {% if follower.follower != user %}
+                          <form action="{% url 'blogs:follow' follower.follower.pk %}" method="POST"
+                            id="follow-form-{{follower.follower.pk}}-follower">
+                            {% csrf_token %}
+                            {% isFollowing user follower.follower as following_this_user %}
+
+                            {% if following_this_user %}
+                            <button class="btn btn-primary float-right" type="submit"
+                              style="color: #fffffff; border: 2px solid #0085a1; width: 10rem;"
+                              id="follow-button-{{follower.follower.pk}}-follower"
+                              onclick="followButton({{follower.follower.pk}}, 'follower', 'following')">Unfollow</button>
+                            {% else %}
+                            <button class="btn btn-light float-right" type="submit"
+                              style="color: #0085a1; border: 2px solid #0085a1; width: 10rem;"
+                              id="follow-button-{{follower.follower.pk}}-follower"
+                              onclick="followButton({{follower.follower.pk}}, 'follower', 'following')">Follow</button>
+                            {% endif %}
+                          </form>
+                          {% endif %}
+                          <br>
+                          <br>
+                          {% endfor %}
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>  
+                  <div class="modal fade" id="following" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel">Following</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body" id="following-modal">
+                          {% for following in following %}
+                          <div class="float-left">
+                          <a href="{% url 'blogs:profile-detail' following.following.id %}"
+                            class="float-left">{{following.following}}</a><br>
+                            {% isFollowing following.following user as is_following %}
+                            {% if is_following %}
+                            <div class="float-left">
+                              <span class="badge badge-dark" style="opacity: .75; font-size: 65%;">Follows You</span>
+                            </div>
+                            {% endif %}
+                          </div>
+                          {% if following.following != user %}
+                          <form action="{% url 'blogs:follow' following.following.pk %}" method="POST"
+                            id="follow-form-{{following.following.pk}}-following">
+                            {% csrf_token %}
+                            {% isFollowing user following.following as following_this_user %}
+                            {% if following_this_user %}
+                            <button class="btn btn-primary float-right" type="submit"
+                              style="color: #fffffff; border: 2px solid #0085a1; width: 10rem;"
+                              id="follow-button-{{following.following.pk}}-following"
+                              onclick="followButton({{following.following.pk}}, 'following', 'follower')">Unfollow</button>
+                            {% else %}
+                            <button class="btn btn-light float-right" type="submit"
+                              style="color: #0085a1; border: 2px solid #0085a1; width: 10rem;"
+                              id="follow-button-{{following.following.pk}}-following"
+                              onclick="followButton({{following.following.pk}}, 'following', 'follower')">Follow</button>
+                            {% endif %}
+                          </form>
+                          {% endif %}
+                          <br>
+                          <br>
+                          {% endfor %}
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+          <form action="{% url 'blogs:follow' user_detail.pk %}" method="POST" id="follow-form" style="margin-top: -40px;">
+            {% csrf_token %}
+            {% isFollowing user user_detail as following_this_user %}
+            {% if following_this_user %}
+            <button class="btn btn-primary" type="submit"
+              style="margin-bottom: -20%; color: #fffffff; border: 2px solid #0085a1; width: 13rem;" id="follow-button"
+              onclick="followUserButton({{user.pk}})">Unfollow <i class="fas fa-user-times"></i></button>
+            {% else %}
+            <button class="btn btn-light" type="submit"
+              style="margin-bottom: -20%; color: #0085a1; border: 2px solid #0085a1; width: 13rem;" id="follow-button"
+              onclick="followUserButton({{user.pk}})">Follow <i class="fas fa-user-check"></i></button>
+            {% endif %}
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+</header>
+
+
+<div class="container">
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home"
+        aria-selected="true">Blogs</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile"
+        aria-selected="false">Profile</a>
+    </li>
+  </ul>
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+      {% for message in messages %}
+      <p>{{message}}</p>
+      {% endfor %}
+      <!-- Main Content -->
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-md-10 mx-auto">
+            {% if all_blogs %}
+            {% for blog in all_blogs  %}
+            <div class="post-preview">
+              <a href="{% url 'blogs:detail' blog.id %}">
+                <h2 class="post-title">
+                  {{blog.title}}
+                </h2>
+                {% if blog.subject %}
+                <h3 class="post-subtitle">
+                  {{blog.subject}}
+                </h3>
+                {% endif %}
+              </a>
+              <p class="post-meta">Posted
+                on {{blog.pub_date}}
+              </p>
             </div>
+            <div class="d-flex justify-content-end" style="margin-top: -50px;">
+              {% commented_this_blog blog user as commented_this_blog %}
+              {% if commented_this_blog %}
+              <span style="color: #0085a1;">
+                {% else %}
+                <span>
+                  {% endif %}
+                  <i class="fas fa-comment-alt "></i></span>&thinsp;{{blog.comments.count}}
+                {% liked_this_blog blog user.id as liked_this_blog %}
+                {% if liked_this_blog %}
+                <span style="color: #dc3545;">
+                  {% else %}
+                  <span>
+                    {% endif %}
+                    <i class="fas fa-heart ml-2"></i></span>&thinsp;{{blog.likes.count}}
+                  <span class="ml-2"><i class="fas fa-eye"></i>&thinsp;{% get_hit_count for blog %}</span>
+            </div>
+            <hr>
+            {% endfor %}
+            {% else %}
+            <p>They have no blogs posted!</p>
+            {% endif %}
           </div>
         </div>
       </div>
-    
-  </header>
+      <div class="d-flex justify-content-center">
+        <div class="pagination">
+          <span class="step-links">
+            {% if page_obj.has_previous %}
+            <a href="?page=1" class="btn btn-dark">First</a>
+            <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-dark">&laquo;</a>
+            {% endif %}
 
-  
-  <div class="container">
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-        <li class="nav-item">
-          <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home"
-            aria-selected="true">Blogs</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile"
-            aria-selected="false">Profile</a>
-        </li>
-      </ul>
-      <div class="tab-content" id="myTabContent">
-        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-        {% for message in messages %}
-            <p>{{message}}</p>
-          {% endfor %}
-          <!-- Main Content -->
-          <div class="container">
-            <div class="row">
-              <div class="col-lg-8 col-md-10 mx-auto">
-                {% if all_blogs %}
-                    {% for blog in all_blogs  %}
-                        <div class="post-preview">
-                            <a href="{% url 'blogs:detail' blog.id %}">
-                                <h2 class="post-title">
-                                {{blog.title}}
-                                </h2>
-                                {% if blog.subject %}
-                                <h3 class="post-subtitle">
-                                {{blog.subject}}
-                                </h3>
-                                {% endif %}
-                            </a>
-                            <p class="post-meta">Posted 
-                                on {{blog.pub_date}}
-                            </p>
-                        </div>
-                        <div class="d-flex justify-content-end" style="margin-top: -50px;">
-                            {% commented_this_blog blog user as commented_this_blog %}
-                            {% if commented_this_blog %}
-                            <span style="color: #0085a1;">
-                            {% else %}
-                            <span>
-                            {% endif %}
-                            <i class="fas fa-comment-alt "></i></span>&thinsp;{{blog.comments.count}}  
-                            {% liked_this_blog blog user.id as liked_this_blog %}
-                            {% if liked_this_blog %}
-                            <span style="color: #dc3545;">
-                            {% else %}
-                            <span>
-                            {% endif %}
-                            <i class="fas fa-heart ml-2"></i></span>&thinsp;{{blog.likes.count}}
-                            <span class="ml-2"><i class="fas fa-eye"></i>&thinsp;{% get_hit_count for blog %}</span>
-                        </div>
-                        <hr> 
-                    {% endfor %}
-                {% else %}
-                    <p>They have no blogs posted!</p>
-                {% endif %}
-              </div>
-            </div>
-          </div>
-          <div class="d-flex justify-content-center">
-            <div class="pagination">
-              <span class="step-links">
-                  {% if page_obj.has_previous %}
-                      <a href="?page=1" class="btn btn-dark">First</a>
-                      <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-dark">&laquo;</a>
-                  {% endif %}
+            <span class="current">
+              Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
 
-                  <span class="current">
-                      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-                  </span>
-
-                  {% if page_obj.has_next %}
-                      <a href="?page={{ page_obj.next_page_number }}" class="btn btn-dark">&raquo;</a>
-                      <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-dark">Last</a>
-                  {% endif %}
-              </span>
-            </div>
-          </div>
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="btn btn-dark">&raquo;</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-dark">Last</a>
+            {% endif %}
+          </span>
         </div>
-        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-          <div class="card mt-3" style="box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12)">
-            <div class="card-body">
-              About Me: {{user_profile.bio}}
-              <br>
-              <br>
-              Interests: {{user_profile.interests}}
-              <br>
-              </div>
-          </div>
-          <div class="card mt-3" style="box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12)">
-            <div class="card-body">
-            Twitter: {{user_profile.twitter}}
-              <br>
-              Portfolio: {{user_profile.portfolio}}
-            <br>
-            </div>
-          </div>
+      </div>
+    </div>
+    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+      <div class="card mt-3" style="box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12)">
+        <div class="card-body">
+          About Me: {{user_profile.bio}}
+          <br>
+          <br>
+          Interests: {{user_profile.interests}}
+          <br>
         </div>
+      </div>
+      <div class="card mt-3" style="box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12)">
+        <div class="card-body">
+          Twitter: {{user_profile.twitter}}
+          <br>
+          Portfolio: {{user_profile.portfolio}}
+          <br>
+        </div>
+      </div>
     </div>
-    </div>
+  </div>
+</div>
 {% endblock header_body %}
+{% block js %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js"></script>
+<script>
+  function followUserButton(id) {
+    $('#follow-form').one('submit', function (e) {
+      e.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: document.getElementById('follow-form').getAttribute('action'),
+        dataType: 'json',
+        data: {
+          csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+        },
+        success: function (msg) {
+          var element = document.getElementById('follow-button');
+          var number = parseInt($('#followers-count').text());
+          if (msg['status'] == 1) {
+            element.innerHTML = 'Unfollow <i class="fas fa-user-times"></i>';
+            element.setAttribute('class', 'btn-primary btn');
+            element.style.color = "white";
+            document.getElementById('followers-count').innerHTML = number + 1;
+            $('#follower-modal').prepend(`<a href="{% url 'blogs:profile-detail' user.id %}"
+                            class="float-left">{{user}}</a><br><br>`);
+          } else {
+            element.innerHTML = 'Follow <i class="fas fa-user-check"></i>';
+            element.setAttribute('class', 'btn-light btn');
+            element.style.color = "#0085a1";
+            document.getElementById('followers-count').innerHTML = number - 1;
+            $(`#follower-link-${id}`).remove();
+          }
+        },
+      });
+    });
+  }
+
+  function followButton(id, type, other) {
+    $(`#follow-form-${id}-${type}`).one('submit', function (e) {
+      e.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: document.getElementById(`follow-form-${id}-${type}`).getAttribute('action'),
+        dataType: 'json',
+        data: {
+          csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+        },
+        success: function (msg) {
+          var element = document.getElementById(`follow-button-${id}-${type}`);
+          var element2 = document.getElementById(`follow-button-${id}-${other}`);
+          if (msg['status'] == 1) {
+            element.innerHTML = 'Unfollow';
+            element.setAttribute('class', 'btn-primary btn float-right');
+            element.style.color = "white";
+            if (element2) {
+              element2.innerHTML = 'Unfollow';
+              element2.setAttribute('class', 'btn-primary btn float-right');
+              element2.style.color = "white";
+            }
+          } else {
+            element.innerHTML = 'Follow';
+            element.setAttribute('class', 'btn-light btn float-right');
+            element.style.color = "#0085a1";
+            if (element2) {
+              element2.innerHTML = 'Follow';
+              element2.setAttribute('class', 'btn-light btn float-right');
+              element2.style.color = "#0085a1";
+            }
+          }
+        },
+      });
+    });
+  }
+</script>
+{% endblock js %}

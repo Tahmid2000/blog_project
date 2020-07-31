@@ -54,6 +54,8 @@ blog_file_rename = FileRename('images/blogs/', 'blog')
 
 
 class Blog(models.Model):
+    class Meta:
+        ordering = ['-pub_date']
     title = models.CharField(max_length=256, unique=True)
     subject = models.CharField(max_length=256, null=True)
     body = RichTextField()
@@ -80,6 +82,8 @@ class Blog(models.Model):
 
 
 class Comment(models.Model):
+    """  class Meta:
+         ordering = ['-pub_date'] """
     blog = models.ForeignKey(
         Blog, on_delete=models.CASCADE, related_name='comments')
     body = models.TextField()
@@ -88,9 +92,11 @@ class Comment(models.Model):
     pub_date = models.DateTimeField(auto_now_add=True)
     comment_likes = models.ManyToManyField(
         settings.AUTH_USER_MODEL, related_name='comment_likes')
+    parent = models.ForeignKey(
+        'self', null=True, related_name='replies', on_delete=models.CASCADE)
 
     def __str__(self):
-        return 'Comment {} by {}'.format(self.body, self.created_by)
+            return 'Comment {} by {}'.format(self.body, self.created_by)
 
 
 class Notification(models.Model):
@@ -106,3 +112,14 @@ class Notification(models.Model):
 
     def __str__(self):
         return self.content
+
+
+class Friend(models.Model):
+    follower = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=1, related_name='follower')
+    following = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=1, related_name='following')
+    pub_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.follower.username + ' follows ' + self.following.username

@@ -8,7 +8,7 @@ urlpatterns = [
          auth_views.LoginView.as_view(redirect_authenticated_user=True), name='login'),
     path('author/logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('author/register/', views.RegisterAuthor.as_view(), name="register"),
-    path('all/', views.IndexView.as_view(), name='index'),
+    path('search/', views.SearchView.as_view(), name='search'),
     path('<int:pk>/', views.DetailView.as_view(), name='detail'),
     path('author/profile/<int:pk>', views.ProfileView.as_view(), name='profile'),
     path('add/', views.BlogCreate.as_view(), name='blog-add'),
@@ -25,7 +25,8 @@ urlpatterns = [
          views.likeComment, name='like-comment'),
     path(
         '<int:pk>/delete/comment/<int:id>', views.deleteComment, name='delete-comment'),
-    path('search/', views.searchBlogs, name='search'),
     path('profile/delete/notif/<int:pk>',
-         views.deleteNotif, name='delete-notif')
+         views.deleteNotif, name='delete-notif'),
+    path('user/<int:following>/follow/', views.follow, name='follow'),
 ]
+""" path('all/', views.IndexView.as_view(), name='index'), """

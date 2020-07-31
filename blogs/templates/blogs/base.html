@@ -25,6 +25,7 @@
     overflow-x: hidden;
     padding-right: 0 !important;
   }
+  
   {% load blog_extras %}
   {% block extra_css %}
   {% endblock extra_css %}
@@ -50,7 +51,9 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'blogs:blog-add' %}">Post New Blog</a>
           </li>
-          
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'blogs:search' %}">Search</a>
+          </li>
           {% if user.is_authenticated %}
             <li class="nav-item">
               {% notif_count user as notifcount %}
@@ -66,7 +69,13 @@
             <li class="nav-item">
               <a class="nav-link" href="{% url 'blogs:login' %}">Login</a>
             </li>
-          {% endif %}
+          {% endif %}{% comment %} 
+          <form class="form-inline" method="GET" action="{% url 'blogs:search' %}">
+            <div class="my-0">
+              <input class="mr-sm-2 search-input" type="text" placeholder="Search" aria-label="Search">
+              <input type="submit" style="display: none;">
+            </div>
+          </form> {% endcomment %}
         </ul>
       </div>
     </div>

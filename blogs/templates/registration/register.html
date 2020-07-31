@@ -7,7 +7,7 @@ Register
 <nav class="navbar navbar-expand-lg bg-dark fixed-top" id="mainNav">
     <div class="container">
       <a class="navbar-brand" href="{% url 'blogs:home' %}" style="color: white;">Blogs For All</a>
-      <button class="navbar-toggler navbar-toggler-right bg-dark" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation" style="color:white; border-color: rgba(255,255,255,.1);"">
+      <button class="navbar-toggler navbar-toggler-right bg-dark" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation" style="color:white; border-color: rgba(255,255,255,.1);">
         Menu
         <i class="fas fa-bars"></i>
       </button>
@@ -16,26 +16,12 @@ Register
           <li class="nav-item">
             <a class="nav-link" href="{% url 'blogs:home' %}" style="color: white;">Home</a>
           </li>
-          
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'blogs:blog-add' %}" style="color: white;">Create New Blog</a>
-          </li>
-          
-          {% comment %} {% if user.is_authenticated %}
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'blogs:profile' %}" style="color: white;">Your Profile/Blogs</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'blogs:logout' %}" style="color: white;">Logout</a>
-            </li>
-          {% else %} {% endcomment %}
             <li class="nav-item">
               <a class="nav-link" href="{% url 'blogs:register' %}" style="color: white;">Register</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{% url 'blogs:login' %}"style="color: white;" >Login</a>
             </li>
-          {% comment %} {% endif %} {% endcomment %}
         </ul>
       </div>
     </div>

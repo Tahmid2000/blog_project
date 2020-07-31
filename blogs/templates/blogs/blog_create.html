@@ -4,28 +4,34 @@ Create
 {% endblock title %}
 {% load static %}
 {% block extra_css %}
- <style>
-  input[type="file"]{
-    display: none;
+<style>
+  input[type="file"] {
+    display: none !important;
   }
-  label[for="id_blog_image"]:hover{
+
+  label[for="id_blog_image"]:hover {
     transition: .2s;
     color: #0085a1;
     text-decoration: underline;
   }
-  input[type="checkbox"]{
+
+  input[type="checkbox"] {
     display: none;
   }
- </style>
+
+  .no-outline:focus {
+    outline: none;
+  }
+</style>
 {% endblock extra_css %}
 {% block header_body %}
 <!-- Page Header -->
-  <header class="masthead"  >
-    <div class="overlay"></div>
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8 col-md-10 mx-auto">
-          <div class="post-heading">
+<header class="masthead">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <div class="post-heading">
           <form method="POST" enctype="multipart/form-data" id="blog-create">
             {% csrf_token %}
             {{form.media}}
@@ -36,45 +42,53 @@ Create
               </div>
             </div>
             <div class="control-group">
-              <div class="form-group floating-label-form-group controls">
+              <div class="form-group floating-label-form-group controls no-outline">
                 <label style="font-size: 20px;" for="title">Subject</label>
                 <h2 style="font-size: 275%;">{{form.subject}}</h2>
               </div>
             </div>
             <div class="d-flex justify-content-center">
-                <div class="mt-4" style="margin-bottom: -100px;">
-                <label type="file" for="id_blog_image" class="btn" style="font-size: 175%;" title="Upload Cover Image"><i class="fas fa-file-image"></i></label>
-                {{form.blog_image}}
-                </div>
+              <div class="mt-4" style="margin-bottom: -100px;">
+                <label type="file" for="id_blog_image" class="btn" style="font-size: 175%;"
+                  title="Upload Cover Image"><i class="fas fa-file-image"></i></label>
+                  <div style="display: none">
+                    {{form.blog_image}}
+                  </div>
+              </div>
             </div>
-            </div>
-          </div>
-        </div>
-      </div>
-  </header>
-  <!-- Post Content -->
-  <article>
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8 col-md-10 mx-auto">
-          <h3>Body</h3>
-          <p>{{form.body}}</p>
-          <a href="{% url 'blogs:profile' user.pk %}" class="btn btn-danger mr-1">Cancel</a>
-          <input type="submit" class="btn-primary btn float-right" value="Post"></input>
-          {{form.posted}}
-          <button type="submit" for="id_posted" class="btn-warning btn float-right mr-3" value="" onclick="addToDrafts()">Add to Drafts</button>
-          {{ form.errors }}
-          {{ form.non_field_errors }}
-        </form>
         </div>
       </div>
     </div>
-  </article>
+  </div>
+</header>
+<!-- Post Content -->
+<article>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <h3>Body</h3>
+        <p>{{form.body}}</p>
+        <a href="{% url 'blogs:profile' user.pk %}" class="btn btn-danger mr-1">Cancel</a>
+        <input type="submit" class="btn-primary btn float-right" value="Post"></input>
+        {{form.posted}}
+        <button type="submit" for="id_posted" class="btn-warning btn float-right mr-3" value=""
+          onclick="addToDrafts()">Add to Drafts</button>
+        {{ form.errors }}
+        {{ form.non_field_errors }}
+        </form>
+      </div>
+    </div>
+  </div>
+</article>
 {% endblock header_body %}
 {% block js %}
 <script>
-  function addToDrafts(){
+  function addToDrafts() {
     document.getElementById("id_posted").checked = false;
   }
+  document.getElementById('id_title').setAttribute('class', 'no-outline');
+  document.getElementById('id_title').setAttribute('placeholder', 'Title');
+  document.getElementById('id_subject').setAttribute('placeholder', 'Subject');
+  document.getElementById('id_subject').setAttribute('class', 'no-outline');
 </script>
 {% endblock js %}

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views import generic
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden, JsonResponse
-from .models import Blog, UserProfileInfo, Comment, Notification
+from .models import Blog, UserProfileInfo, Comment, Notification, Friend
 from django.urls import reverse_lazy, reverse, path
 from django.contrib.auth.forms import UserCreationForm
 from .forms import UserForm, UserProfileForm, BlogForm, CommentForm
@@ -36,7 +36,17 @@ class HomeView(generic.ListView):
         return context
 
     def get_queryset(self):
-        return Blog.objects.filter(posted=1).order_by('-pub_date')[:5]
+        if self.request.user.is_authenticated:
+            following_created_by = Friend.objects.filter(
+                follower=self.request.user).values('following')
+            following_created_by_id = following_created_by.values('id')
+        if self.request.user.is_authenticated:
+            if Blog.objects.filter(posted=1).filter(Q(created_by__in=following_created_by) | Q(likes__in=following_created_by)).exclude(created_by=self.request.user).distinct().count() > 0:
+                return Blog.objects.filter(posted=1).filter(Q(created_by__in=following_created_by) | Q(likes__in=following_created_by)).exclude(created_by=self.request.user).distinct().order_by('-pub_date')
+            else:
+                return Blog.objects.filter(posted=1).order_by('-pub_date')
+        else:
+            return Blog.objects.filter(posted=1).order_by('-pub_date')
 
 
 @login_required(login_url='login')
@@ -71,13 +81,26 @@ class IndexView(generic.ListView):
         return Blog.objects.filter(posted=1).order_by('-pub_date')
 
 
-def searchBlogs(request, *args, **kwargs):
-    """ if request.method == 'POST': """
-    query = request.POST.get("query", "")
-    context = {}
-    context['all_blogs'] = Blog.objects.annotate(search=SearchVector(
-        'title', 'subject', 'body'),).filter(search=query)
-    return render(request, 'blogs/index.html', context)
+class SearchView(generic.ListView):
+    paginate_by = 5
+    template_name = 'blogs/search.html'
+    context_object_name = 'all_blogs'
+
+    def get_context_data(self, **kwargs):
+        context = super(SearchView, self).get_context_data(**kwargs)
+        query = self.request.GET.get('q')
+        if query:
+            context.update({
+                'users': User.objects.all().filter(Q(username__icontains=query)),
+            })
+        return context
+
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        if query:
+            return Blog.objects.filter(posted=1).filter(Q(title__icontains=query) | Q(subject__icontains=query) | Q(body__icontains=query) | Q(created_by__username__icontains=query)).order_by('-pub_date')
+        else:
+            return Blog.objects.none()
 
 
 @method_decorator(login_required, name='post')
@@ -98,7 +121,7 @@ class DetailView(HitCountDetailView, generic.edit.FormMixin):
     def get_context_data(self, **kwargs):
         context = super(DetailView, self).get_context_data(**kwargs)
         context.update({
-            'comments': Comment.objects.filter(blog=self.kwargs['pk']).order_by('-pub_date'),
+            'comments': Comment.objects.filter(blog=self.kwargs['pk'], parent=None).order_by('-pub_date'),
             'like_count': self.get_object().likes.all().count,
             'likedpost': self.get_object().likes.filter(pk=self.request.user.id).exists()
         })
@@ -117,6 +140,9 @@ class DetailView(HitCountDetailView, generic.edit.FormMixin):
     def form_valid(self, form):
         f = form.save(commit=False)
         f.blog = self.get_object()
+        parentID = self.request.POST.get('parent_id')
+        if parentID:
+            f.parent = get_object_or_404(Comment, pk=parentID)
         f.created_by = self.request.user
         f.pub_date = datetime.datetime.now()
         f.save()
@@ -124,6 +150,11 @@ class DetailView(HitCountDetailView, generic.edit.FormMixin):
             notif = Notification(
                 sender=self.request.user, receiver=f.blog.created_by, blog=f.blog, content="commented on your post")
             notif.save()
+        if f.parent:
+            if self.request.user != f.parent.created_by:
+                notif = Notification(
+                    sender=self.request.user, receiver=f.parent.created_by, blog=f.blog, content="replied to your comment on")
+                notif.save()
         return super().form_valid(form)
 
 
@@ -178,6 +209,7 @@ def deleteComment(request, *args, **kwargs):
     comment = get_object_or_404(Comment, pk=kwargs['id'])
     if request.user == comment.created_by:
         comment.delete()
+        return JsonResponse({'deleted': True})
     return redirect('blogs:detail', kwargs['pk'])
 
 
@@ -218,9 +250,6 @@ class BlogUpdate(UserPassesTestMixin, generic.edit.UpdateView):
 
     def form_valid(self, form):
         f = form.save(commit=False)
-        """ if not self.get_object().posted:
-            f.pub_date = datetime.datetime.now()
-        else: """
         if self.get_object().posted != f.posted:
             f.pub_date = datetime.datetime.now()
         else:
@@ -257,7 +286,9 @@ class ProfileView(generic.ListView):
             'likes': Blog.objects.all().filter(likes__in=[self.request.user], posted=1).order_by('-pub_date'),
             'like_count': Blog.objects.all().filter(created_by=self.request.user, posted=1, likes__isnull=False).values('likes').count(),
             'blogs_count': Blog.objects.all().filter(created_by=self.request.user, posted=1).count(),
-            'notifs': Notification.objects.filter(receiver=self.request.user).order_by('-pub_date')
+            'notifs': Notification.objects.filter(receiver=self.request.user).order_by('-pub_date'),
+            'followers': Friend.objects.filter(following=self.request.user).order_by('-pub_date'),
+            'following': Friend.objects.filter(follower=self.request.user).order_by('-pub_date'),
         })
         return context
 
@@ -265,7 +296,12 @@ class ProfileView(generic.ListView):
         return Blog.objects.all().filter(created_by=self.request.user, posted=1).order_by('-pub_date')
 
 
-class ProfileDetail(generic.ListView):
+class ProfileDetail(UserPassesTestMixin, generic.ListView):
+    def test_func(self):
+        return self.request.user != User.objects.filter(pk=self.kwargs['pk']).first()
+
+    def handle_no_permission(self):
+        return redirect('blogs:profile', self.request.user.pk)
     paginate_by = 5
     template_name = 'profiles/profile_detail.html'
     context_object_name = 'all_blogs'
@@ -274,10 +310,13 @@ class ProfileDetail(generic.ListView):
     def get_context_data(self, **kwargs):
         context = super(generic.ListView, self).get_context_data(**kwargs)
         context.update({
+            'user_detail': User.objects.filter(pk=self.kwargs['pk']).first(),
             'user_profile': UserProfileInfo.objects.filter(created_by=self.kwargs['pk']).first(),
             'user_name': str(Blog.objects.all().filter(created_by=self.kwargs['pk'], posted=1).first().created_by),
             'like_count': Blog.objects.all().filter(created_by=self.kwargs['pk'], posted=1, likes__isnull=False).values('likes').count(),
-            'blogs_count': Blog.objects.all().filter(created_by=self.kwargs['pk'], posted=1).count()
+            'blogs_count': Blog.objects.all().filter(created_by=self.kwargs['pk'], posted=1).count(),
+            'followers': Friend.objects.filter(following=self.kwargs['pk']).order_by('-pub_date'),
+            'following': Friend.objects.filter(follower=self.kwargs['pk']).order_by('-pub_date'),
         })
         return context
 
@@ -308,6 +347,26 @@ class ProfileUpdate(UserPassesTestMixin, generic.edit.UpdateView):
     model = UserProfileInfo
     template_name = 'profiles/profile_update.html'
     form_class = UserProfileForm
+
+
+@login_required
+def follow(request, *args, **kwargs):
+    follower = request.user
+    following = get_object_or_404(User, pk=kwargs['following'])
+    response_data = {}
+    if follower != following:
+        if Friend.objects.filter(follower=follower, following=following).count() > 0:
+            response_data['status'] = 0
+            Friend.objects.filter(
+                follower=follower, following=following).delete()
+        else:
+            f = Friend(follower=follower, following=following)
+            f.save()
+            notif = Notification(
+                sender=follower, receiver=following, blog=None, content="followed you")
+            notif.save()
+            response_data['status'] = 1
+    return JsonResponse(response_data)
 
 
 """ @method_decorator(login_required, name='dispatch')
