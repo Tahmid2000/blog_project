@@ -18,6 +18,7 @@ Update
   input[type="checkbox"] {
     display: none;
   }
+}
 </style>
 {% endblock extra_css %}
 {% block header_body %}
@@ -78,11 +79,11 @@ Update
         {{form.posted}}
         {% if blog.posted %}
         <input type="submit" class="btn-primary btn float-right" value="Update"></input>
-        <input type="submit" class="btn-warning btn float-right mr-3" value="Move to Drafts"
-          onclick="addToDrafts()"></input>
+        <input type="submit" class="btn-warning btn float-right" value="Move to Drafts"
+          onclick="addToDrafts()" id="private-button"></input>
         {% else %}
         <input type="submit" class="btn-primary btn float-right" value="Make Public" onclick="makePublic()"></input>
-        <input type="submit" class="btn-warning btn float-right mr-3" value="Save Changes"></input>
+        <input type="submit" class="btn-warning btn float-right" value="Save Changes" id="private-button"></input>
         {% endif %}
         </form>
       </div>
@@ -99,5 +100,7 @@ Update
   function addToDrafts() {
     document.getElementById("id_posted").checked = false;
   }
+})
+
 </script>
 {% endblock js %}

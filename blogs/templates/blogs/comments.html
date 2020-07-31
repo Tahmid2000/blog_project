@@ -2,8 +2,8 @@
 {% load crispy_forms_tags %}
 {% if comments %}
 {% for comment in comments %}
-<div class="media d-block d-md-flex" id="comment-content-{{comment.pk}}">
-    <div class="media-body text-center text-md-left ml-md-3 ml-0">
+<div class="media d-block" id="comment-content-{{comment.pk}}">
+    <div class="media-body text-md-left ml-sm-3">
         <h5 class="mt-0 font-weight-bold user-pub">
             {% if comment.created_by == user %}
             <a href="{% url 'blogs:profile' comment.created_by.id%}">{{comment.created_by}} </a>
@@ -12,6 +12,7 @@
             {% endif %}
         </h5>
         {{comment.body}}
+        
         <div class="float-right">
             <form action="{% url 'blogs:like-comment' blog.pk comment.pk %}" method="POST"
                 id="comment-like-form-{{blog.pk}}-{{comment.pk}}">
@@ -34,7 +35,7 @@
         {% if comment.created_by == user%}
         <div class="float-right mr-2 trash-button">
             <span title="Delete"
-                onclick="deleteComment(`{% url 'blogs:delete-comment' blog.pk comment.pk %}`, {{comment.pk}}, {{comment.replies.all.count}})"><i
+                onclick="deleteComment(`{% url 'blogs:delete-comment' blog.pk comment.pk %}`, {{comment.pk}})"><i
                     class="fas fa-trash"></i></span>
         </div>
         {% endif %}
@@ -50,59 +51,12 @@
         </div>
 
         <div class="mt-1"></div>
-        {% for reply in comment.replies.all %}
-        <div class="media d-block" id="comment-content-{{reply.pk}}">
-            <div class="media-body text-center text-md-left ml-md-3 ml-0">
-                <h5 class="mt-0 font-weight-bold user-pub">
-                    {% if reply.created_by == user %}
-                    <a href="{% url 'blogs:profile' reply.created_by.id%}">{{reply.created_by}} </a>
-                    {% else %}
-                    <a href="{% url 'blogs:profile-detail' reply.created_by.id %}">{{reply.created_by}}</a>
-                    {% endif %}
-                </h5>
-                {{reply.body}}
-                <div class="float-right">
-                    <form action="{% url 'blogs:like-comment' blog.pk reply.pk %}" method="POST"
-                        id="comment-like-form-{{blog.pk}}-{{reply.pk}}">
-                        {% csrf_token %}
-                        {% is_liked reply user.pk as comment_liked_by_user %}
-                        <span class="comment-count" id="like-count-{{reply.pk}}"> {{reply.comment_likes.count}}
-                        </span>
-                        {% if comment_liked_by_user %}
-                        <span class="comment-like-button-liked" id="comment-like-button-styling-{{reply.pk}}">
-                            {% else %}
-                            <span class="comment-like-button" id="comment-like-button-styling-{{reply.pk}}">
-                                {% endif %}
-                                <label title="Like" for="{{reply.pk}}"
-                                    onclick="commentLike({{blog.pk}}, {{reply.pk}})"><i
-                                        class="fas fa-heart"></i></label> </span>
-                            <input style="display: none" type="submit" id="{{reply.pk}}" name="{{reply.pk}}">
-                    </form>
-                </div>
-                <div class="float-right mr-2 reply-button" onclick="replyBox({{reply.pk}})"
-                    id="reply-button-{{reply.pk}}"><i class="fas fa-reply"></i></div>
-                {% if reply.created_by == user%}
-                <div class="float-right trash-button mr-2">
-                    <span title="Delete"
-                        onclick="deleteComment(`{% url 'blogs:delete-comment' blog.pk reply.pk %}`, {{reply.pk}}, {{reply.replies.all.count}})"><i
-                            class="fas fa-trash"></i></span>
-                </div>
-                {% endif %}
-                <div style="display:none;" id="div-{{reply.pk}}">
-                    <form action="" method="POST" class="mb-3" id="reply-form-{{reply.pk}}">
-                        {% csrf_token %}
-                        <input type="hidden" name="parent_id" value="{{reply.pk}}">
-                        {{form|crispy}}
-                        <div class="d-flex justify-content-end">
-                            <input type="submit" class="btn btn-primary" value="reply">
-                        </div>
-                    </form>
-                </div>
-
-            </div>
-        </div>
-        {% endfor %}
+        {% if comment.replies.all|length %}
+        {% include "blogs/comments.html" with comments=comment.replies.all %}
+        {% endif %}
+        {% if not comment.parent %}
         <hr>
+        {% endif %}
     </div>
 </div>
 {% endfor %}

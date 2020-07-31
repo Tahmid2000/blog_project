@@ -208,8 +208,10 @@ def likeComment(request, *args, **kwargs):
 def deleteComment(request, *args, **kwargs):
     comment = get_object_or_404(Comment, pk=kwargs['id'])
     if request.user == comment.created_by:
+        blog = comment.blog
         comment.delete()
-        return JsonResponse({'deleted': True})
+        print(blog.comments.count())
+        return JsonResponse({'deleted': True, 'count': blog.comments.count()})
     return redirect('blogs:detail', kwargs['pk'])
 
 

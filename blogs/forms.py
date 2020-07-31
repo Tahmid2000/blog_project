@@ -21,7 +21,7 @@ class UserForm(UserCreationForm):
 class UserProfileForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(UserProfileForm, self).__init__(*args, **kwargs)
-        for fieldname in ['interests', 'twitter', 'portfolio']:
+        for fieldname in ['interests', 'twitter', 'portfolio', 'github', 'linkedin']:
             self.fields[fieldname].required = False
     bio = forms.CharField(required=False, widget=forms.Textarea(
         attrs={'rows': 5, 'cols': 20}))
@@ -30,7 +30,8 @@ class UserProfileForm(forms.ModelForm):
 
     class Meta:
         model = UserProfileInfo
-        fields = ['bio', 'interests', 'profile_pic', 'twitter', 'portfolio']
+        fields = ['bio', 'interests', 'profile_pic',
+                  'github', 'portfolio', 'twitter', 'linkedin']
 
 
 class BlogForm(forms.ModelForm):

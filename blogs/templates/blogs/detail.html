@@ -76,6 +76,12 @@ color: #0085a1;
 font-size: 80%;
 margin-bottom: 0;
 }
+
+@media (min-width: 659px) {
+  .hidden-ss {
+    display: none !important;
+  }
+}
 {% endblock extra_css %}
 {% load static %}
 {% load crispy_forms_tags %}
@@ -226,7 +232,7 @@ margin-bottom: 0;
 </script>
 
 <script>
-  function deleteComment(deleteUrl, id, replyCount) {
+  function deleteComment(deleteUrl, id) {
     event.preventDefault();
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {
@@ -254,10 +260,9 @@ margin-bottom: 0;
             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
           },
           success: function (msg) {
-            var number = parseInt($('#comment-count-total').text()) - 1 - replyCount;
             document.getElementById(`comment-content-${id}`).remove();
-            document.getElementById('comment-count-total').innerHTML = number;
-            if (number === 0) {
+            document.getElementById('comment-count-total').innerHTML = msg['count'];
+            if (msg['count'] === 0) {
               document.getElementById('all-comment-content').innerHTML = "Be the first to comment!";
             }
           }

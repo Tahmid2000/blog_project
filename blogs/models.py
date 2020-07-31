@@ -40,8 +40,14 @@ class UserProfileInfo(models.Model):
     interests = models.CharField(max_length=256)
     profile_pic = models.ImageField(
         upload_to=profile_pic_rename, default="blogs/images/home-bg.jpg")
-    twitter = models.URLField(default=None, max_length=256)
-    portfolio = models.URLField(default=None, max_length=256)
+    github = models.URLField(default=None, null=True,
+                             blank=True, max_length=256)
+    twitter = models.URLField(default=None, null=True,
+                              blank=True, max_length=256)
+    portfolio = models.URLField(
+        default=None, null=True, blank=True, max_length=256)
+    linkedin = models.URLField(
+        default=None, null=True, blank=True, max_length=256)
 
     def __str__(self):
         return self.created_by.username
@@ -96,7 +102,7 @@ class Comment(models.Model):
         'self', null=True, related_name='replies', on_delete=models.CASCADE)
 
     def __str__(self):
-            return 'Comment {} by {}'.format(self.body, self.created_by)
+        return 'Comment {} by {}'.format(self.body, self.created_by)
 
 
 class Notification(models.Model):
