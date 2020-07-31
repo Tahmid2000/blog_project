@@ -143,15 +143,27 @@ color: white;
                     {% if users %}
                     {% for the_user in users  %}
                     <div class="post-preview">
-                        {% if the_user == user %}
-                        <a href="{% url 'blogs:profile' the_user.id%}">
-                            {% else %}
-                            <a href="{% url 'blogs:profile-detail' the_user.id %}">
-                                {% endif %}
-                                <h2 class="post-title text-center">
-                                    {{the_user}}
-                                </h2>
-                            </a>
+                        <a href="{% url 'blogs:profile-detail' the_user.id %}">
+                            <h2 class="post-title text-center">
+                                {{the_user}}
+                            </h2>
+                        </a>
+                        {% isFollowing the_user user as is_following %}
+                        {% if is_following %}
+                        <div style="margin-top: -10px;">
+                            <div class="d-flex justify-content-center">
+                            <span class="badge badge-dark" style="opacity: .75; font-size: 90%;">Follows You</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="d-flex justify-content-center">
+                        {% followers_count the_user %} Followers &nbsp;
+                        {% following_count the_user %} Following &nbsp;
+                        </div>
+                        <div class="d-flex justify-content-center">
+                        {% blogs_count the_user %} Blogs &nbsp;
+                        {% likes_count the_user %} Likes
+                        </div>
                     </div>
                     <hr>
                     {% endfor %}

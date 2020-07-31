@@ -1,5 +1,5 @@
 from django import template
-from blogs.models import Notification, Friend
+from blogs.models import Notification, Friend, Blog
 register = template.Library()
 
 
@@ -27,3 +27,23 @@ def notif_count(user):
 @register.simple_tag
 def isFollowing(user1, user2):
     return Friend.objects.filter(follower=user1, following=user2).count() > 0
+
+
+@register.simple_tag
+def followers_count(user):
+    return Friend.objects.filter(following=user).count()
+
+
+@register.simple_tag
+def following_count(user):
+    return Friend.objects.filter(follower=user).count()
+
+
+@register.simple_tag
+def blogs_count(user):
+    return Blog.objects.filter(created_by=user, posted=1).count()
+
+
+@register.simple_tag
+def likes_count(user):
+    return Blog.objects.filter(created_by=user, posted=1, likes__isnull=False).values('likes').count()
