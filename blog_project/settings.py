@@ -27,8 +27,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['blogsforall.herokuapp.com', '127.0.0.1']
 
-SECRET_KEY = config('SECRET_KEY')
-DEBUG = config('DEBUG', cast=bool)
+SECRET_KEY = 'i6bk88ya!z(9itn%wep@hdu#u43%6%s2ep&8m90lx^_%tu0m3'
 # Application definition
 
 INSTALLED_APPS = [
@@ -53,6 +52,7 @@ HITCOUNT_KEEP_HIT_ACTIVE = {'days': 1}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -133,8 +133,9 @@ CKEDITOR_CONFIGS = {
         'width': '100%'
     }
 }
+
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 LOGIN_URL = '/blogs/author/login'
