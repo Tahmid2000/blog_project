@@ -27,7 +27,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['blogsforall.herokuapp.com', '127.0.0.1']
 
-SECRET_KEY = 'i6bk88ya!z(9itn%wep@hdu#u43%6%s2ep&8m90lx^_%tu0m3'
+SECRET_KEY = 'i6bk88ya!z(9itn%wep@hdu#!u43%6%s2ep&8m90lx^_%tu0m3'
 # Application definition
 
 INSTALLED_APPS = [
