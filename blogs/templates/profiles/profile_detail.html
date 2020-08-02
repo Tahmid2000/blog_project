@@ -347,14 +347,14 @@ nav{
           var number = parseInt($('#followers-count').text());
           if (msg['status'] == 1) {
             element.innerHTML = 'Unfollow <i class="fas fa-user-times"></i>';
-            element.setAttribute('class', 'btn-primary btn');
+            element.setAttribute('class', 'btn-primary btn mt-3');
             element.style.color = "white";
             document.getElementById('followers-count').innerHTML = number + 1;
             $('#follower-modal').prepend(`<a href="{% url 'blogs:profile-detail' user.id %}"
                             class="float-left">{{user}}</a><br><br>`);
           } else {
             element.innerHTML = 'Follow <i class="fas fa-user-check"></i>';
-            element.setAttribute('class', 'btn-light btn');
+            element.setAttribute('class', 'btn-light btn mt-3');
             element.style.color = "#0085a1";
             document.getElementById('followers-count').innerHTML = number - 1;
             $(`#follower-link-${id}`).remove();
