@@ -314,7 +314,7 @@ class ProfileDetail(UserPassesTestMixin, generic.ListView):
         context.update({
             'user_detail': User.objects.filter(pk=self.kwargs['pk']).first(),
             'user_profile': UserProfileInfo.objects.filter(created_by=self.kwargs['pk']).first(),
-            'user_name': str(Blog.objects.all().filter(created_by=self.kwargs['pk'], posted=1).first().created_by),
+            'user_name': User.objects.filter(pk=self.kwargs['pk']).first().username,
             'like_count': Blog.objects.all().filter(created_by=self.kwargs['pk'], posted=1, likes__isnull=False).values('likes').count(),
             'blogs_count': Blog.objects.all().filter(created_by=self.kwargs['pk'], posted=1).count(),
             'followers': Friend.objects.filter(following=self.kwargs['pk']).order_by('-pub_date'),
