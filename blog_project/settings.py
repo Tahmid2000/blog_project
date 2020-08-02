@@ -139,7 +139,3 @@ MEDIA_URL = '/media/'
 LOGIN_URL = '/blogs/author/login'
 LOGIN_REDIRECT_URL = 'blogs:home'
 LOGOUT_REDIRECT_URL = 'blogs:home'
-
-if 'DATABASE_URL' in os.environ:
-    import dj_database_url
-    DATABASES = {'default': dj_database_url.config()}
