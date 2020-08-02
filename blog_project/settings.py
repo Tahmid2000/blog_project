@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django_filters',
     'hitcount',
     'notifications',
+    'storages'
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -132,13 +133,22 @@ CKEDITOR_CONFIGS = {
     }
 }
 
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
-STATIC_URL = '/static/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
 LOGIN_URL = '/blogs/author/login'
 LOGIN_REDIRECT_URL = 'blogs:home'
 LOGOUT_REDIRECT_URL = 'blogs:home'
+
+AWS_ACCESS_KEY_ID = 'AKIASVTRIDW5MHWLLDX3'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'blogsforall-assets'
+AWS_DEFAULT_ACL = None
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+""" STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_URL = '/static/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/' """
+
 
 if 'DATABASE_URL' in os.environ:
     import dj_database_url
