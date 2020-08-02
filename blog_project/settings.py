@@ -137,8 +137,9 @@ LOGIN_URL = '/blogs/author/login'
 LOGIN_REDIRECT_URL = 'blogs:home'
 LOGOUT_REDIRECT_URL = 'blogs:home'
 
-AWS_ACCESS_KEY_ID = os.getenv('SECRET_KEY', 'Optional default value')
-AWS_SECRET_ACCESS_KEY = os.getenv('SECRET_KEY', 'Optional default value')
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID', 'Optional default value')
+AWS_SECRET_ACCESS_KEY = os.getenv(
+    'AWS_SECRET_ACCESS_KEY', 'Optional default value')
 AWS_STORAGE_BUCKET_NAME = 'blogsforall-assets'
 AWS_DEFAULT_ACL = None
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
