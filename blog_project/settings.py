@@ -166,16 +166,3 @@ DEFAULT_FILE_STORAGE = 'blog_project.storage_backends.MediaStorage'
 if 'DATABASE_URL' in os.environ:
     import dj_database_url
     DATABASES = {'default': dj_database_url.config()}
-
-
-""" <?xml version = "1.0" encoding = "UTF-8"?>
-<CORSConfiguration xmlns = "http://s3.amazonaws.com/doc/2006-03-01/" >
-<CORSRule >
-<AllowedOrigin > * < /AllowedOrigin >
-<AllowedMethod > GET < /AllowedMethod >
-<AllowedMethod > POST < /AllowedMethod >
-<AllowedMethod > PUT < /AllowedMethod >
-<AllowedHeader > * < /AllowedHeader >
-</CORSRule >
-</CORSConfiguration >
- """
