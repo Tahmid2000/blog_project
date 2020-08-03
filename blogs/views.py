@@ -65,7 +65,7 @@ class RegisterAuthor(generic.edit.CreateView):
         return super(RegisterAuthor, self).dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        messages.add_message(self.request, messages.SUCCESS, 'Author created!')
+        messages.add_message(self.request, messages.SUCCESS, 'Welcome!')
         return reverse('blogs:login')
 
 
