@@ -145,11 +145,9 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'blogs/static'),
 ]
 
-AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID', 'Optional default value')
-AWS_SECRET_ACCESS_KEY = os.getenv(
-    'AWS_SECRET_ACCESS_KEY', 'Optional default value')
-AWS_STORAGE_BUCKET_NAME = os.getenv(
-    'AWS_STORAGE_BUCKET_NAME', 'Optional default value')
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = 'blogsforall-files'
 AWS_DEFAULT_ACL = None
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 
