@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django_filters',
     'hitcount',
     'notifications',
+    'storages',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -131,15 +132,50 @@ CKEDITOR_CONFIGS = {
         'width': '100%'
     }
 }
+LOGIN_URL = '/blogs/author/login'
+LOGIN_REDIRECT_URL = 'blogs:home'
+LOGOUT_REDIRECT_URL = 'blogs:home'
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
-LOGIN_URL = '/blogs/author/login'
-LOGIN_REDIRECT_URL = 'blogs:home'
-LOGOUT_REDIRECT_URL = 'blogs:home'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'blogs/static'),
+]
+
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID', 'Optional default value')
+AWS_SECRET_ACCESS_KEY = os.getenv(
+    'AWS_SECRET_ACCESS_KEY', 'Optional default value')
+AWS_STORAGE_BUCKET_NAME = os.getenv(
+    'AWS_STORAGE_BUCKET_NAME', 'Optional default value')
+AWS_DEFAULT_ACL = None
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+
+AWS_LOCATION = 'static'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+
+DEFAULT_FILE_STORAGE = 'blog_project.storage_backends.MediaStorage'
 
 if 'DATABASE_URL' in os.environ:
     import dj_database_url
     DATABASES = {'default': dj_database_url.config()}
+
+
+""" <?xml version = "1.0" encoding = "UTF-8"?>
+<CORSConfiguration xmlns = "http://s3.amazonaws.com/doc/2006-03-01/" >
+<CORSRule >
+<AllowedOrigin > * < /AllowedOrigin >
+<AllowedMethod > GET < /AllowedMethod >
+<AllowedMethod > POST < /AllowedMethod >
+<AllowedMethod > PUT < /AllowedMethod >
+<AllowedHeader > * < /AllowedHeader >
+</CORSRule >
+</CORSConfiguration >
+ """
