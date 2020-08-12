@@ -71,7 +71,7 @@ Create
         <a href="{% url 'blogs:profile' user.pk %}" class="btn btn-danger mr-1">Cancel</a>
         <input type="submit" class="btn-primary btn float-right" value="Post"></input>
         {{form.posted}}
-        <button type="submit" for="id_posted" class="btn-warning btn float-right mr-3" value=""
+        <button type="submit" for="id_posted" class="btn-warning btn float-right" value=""
           onclick="addToDrafts()">Add to Drafts</button>
         {{ form.errors }}
         {{ form.non_field_errors }}

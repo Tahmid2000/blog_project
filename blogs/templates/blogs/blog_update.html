@@ -73,18 +73,19 @@ Update
       <div class="col-lg-8 col-md-10 mx-auto">
         <h3>Body</h3>
         <p>{{form.body|safe}}</p>
-        {{ form.errors }}
-        {{ form.non_field_errors }}
+        
         <a href="{% url 'blogs:detail' blog.pk %}" class="btn btn-danger mr-1">Cancel</a>
         {{form.posted}}
         {% if blog.posted %}
         <input type="submit" class="btn-primary btn float-right" value="Update"></input>
-        <input type="submit" class="btn-warning btn float-right" value="Move to Drafts"
-          onclick="addToDrafts()" id="private-button"></input>
+        <button type="submit" class="btn-warning btn float-right"
+          onclick="addToDrafts()" id="private-button">Move To Drafts</button>
         {% else %}
-        <input type="submit" class="btn-primary btn float-right" value="Make Public" onclick="makePublic()"></input>
+        <button type="submit" class="btn-primary btn float-right" onclick="makePublic()">Make Public</button>
         <input type="submit" class="btn-warning btn float-right" value="Save Changes" id="private-button"></input>
         {% endif %}
+        {{ form.errors }}
+        {{ form.non_field_errors }}
         </form>
       </div>
     </div>
@@ -100,7 +101,6 @@ Update
   function addToDrafts() {
     document.getElementById("id_posted").checked = false;
   }
-})
 
 </script>
 {% endblock js %}
