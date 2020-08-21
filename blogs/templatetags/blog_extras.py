@@ -25,8 +25,10 @@ def notif_count(user):
 
 
 @register.simple_tag
-def isFollowing(user1, user2):
-    return Friend.objects.filter(follower=user1, following=user2).count() > 0
+def isFollowing(user1, user2, auth):
+    if auth == True:
+        return Friend.objects.filter(follower=user1, following=user2).count() > 0
+    return False
 
 
 @register.simple_tag

@@ -45,7 +45,7 @@ nav{
           <div class="d-flex justify-content-center">
             <h1 class="title">{{user_name}}</h1>
           </div>
-          {% isFollowing user_detail user as is_following %}
+          {% isFollowing user_detail user user.is_authenticated as is_following %}
           {% if is_following %}
           <div style="margin-top: -1px; margin-bottom: -20px;">
             <span class="badge badge-dark" style="opacity: .75; font-size: 100%;">Follows You</span>
@@ -80,7 +80,7 @@ nav{
                           <div class="float-left">
                             <a href="{% url 'blogs:profile-detail' follower.follower.id %}" class="float-left"
                               id="follower-link-{{follower.follower.pk}}">{{follower.follower}}</a><br>
-                            {% isFollowing follower.follower user as is_following %}
+                            {% isFollowing follower.follower user user.is_authenticated as is_following %}
                             {% if is_following %}
                             <div class="float-left">
                               <span class="badge badge-dark" style="opacity: .75; font-size: 75%;">Follows You</span>
@@ -92,7 +92,7 @@ nav{
                           <form action="{% url 'blogs:follow' follower.follower.pk %}" method="POST"
                             id="follow-form-{{follower.follower.pk}}-follower">
                             {% csrf_token %}
-                            {% isFollowing user follower.follower as following_this_user %}
+                            {% isFollowing user follower.follower user.is_authenticated as following_this_user %}
                             {% if following_this_user %}
                             <button class="btn btn-primary float-right" type="submit"
                               style="color: #fffffff; border: 2px solid #0085a1; width: 10rem;"
@@ -131,7 +131,7 @@ nav{
                           <div class="float-left">
                             <a href="{% url 'blogs:profile-detail' following.following.id %}"
                               class="float-left">{{following.following}}</a><br>
-                            {% isFollowing following.following user as is_following %}
+                            {% isFollowing following.following user user.is_authenticated as is_following %}
                             {% if is_following %}
                             <div class="float-left">
                               <span class="badge badge-dark" style="opacity: .75; font-size: 65%;">Follows You</span>
@@ -142,7 +142,7 @@ nav{
                           <form action="{% url 'blogs:follow' following.following.pk %}" method="POST"
                             id="follow-form-{{following.following.pk}}-following">
                             {% csrf_token %}
-                            {% isFollowing user following.following as following_this_user %}
+                            {% isFollowing user following.following user.is_authenticated as following_this_user %}
                             {% if following_this_user %}
                             <button class="btn btn-primary float-right" type="submit"
                               style="color: #fffffff; border: 2px solid #0085a1; width: 10rem;"
@@ -173,7 +173,7 @@ nav{
           <div style="margin-bottom: -15%;">
             <form action="{% url 'blogs:follow' user_detail.pk %}" method="POST" id="follow-form">
               {% csrf_token %}
-              {% isFollowing user user_detail as following_this_user %}
+              {% isFollowing user user_detail user.is_authenticated as following_this_user %}
               {% if following_this_user %}
               <button class="btn btn-primary mt-3" type="submit"
                 style="color: #fffffff; border: 2px solid #0085a1; width: 13rem;" id="follow-button"
@@ -233,7 +233,7 @@ nav{
             </div>
             <br class="hidden-ss">
             <div class="d-flex justify-content-end" style="margin-top: -50px;">
-              {% commented_this_blog blog user as commented_this_blog %}
+              {% commented_this_blog blog user.id as commented_this_blog %}
               {% if commented_this_blog %}
               <span style="color: #0085a1;">
                 {% else %}
@@ -333,7 +333,7 @@ nav{
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js"></script>
 <script>
   function followUserButton(id) {
-    $('#follow-form').one('submit', function (e) {
+      $('#follow-form').one('submit', function (e) {
       e.preventDefault();
       $.ajax({
         type: 'POST',
@@ -350,8 +350,8 @@ nav{
             element.setAttribute('class', 'btn-primary btn mt-3');
             element.style.color = "white";
             document.getElementById('followers-count').innerHTML = number + 1;
-            $('#follower-modal').prepend(`<a href="{% url 'blogs:profile-detail' user.id %}"
-                            class="float-left">{{user}}</a><br><br>`);
+            $('#follower-modal').prepend(` {% if user.is_authenticated %}<a href="{% url 'blogs:profile-detail' user.id %}"
+                            class="float-left">{{user}}</a>{% endif %}`);
           } else {
             element.innerHTML = 'Follow <i class="fas fa-user-check"></i>';
             element.setAttribute('class', 'btn-light btn mt-3');
@@ -362,6 +362,7 @@ nav{
         },
       });
     });
+    
   }
 
   function followButton(id, type, other) {

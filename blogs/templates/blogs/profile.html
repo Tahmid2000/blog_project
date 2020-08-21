@@ -88,7 +88,7 @@ nav{
                           <div class="float-left">
                             <a href="{% url 'blogs:profile-detail' follower.follower.id %}"
                               class="float-left">{{follower.follower}}</a><br>
-                            {% isFollowing follower.follower user as is_following %}
+                            {% isFollowing follower.follower user user.is_authenticated as is_following %}
                             {% if is_following %}
                             <div class="float-left">
                               <span class="badge badge-dark" style="opacity: .75; font-size: 75%;">Follows You</span>
@@ -98,7 +98,7 @@ nav{
                           <form action="{% url 'blogs:follow' follower.follower.pk %}" method="POST"
                             id="follow-form-{{follower.follower.pk}}-follower">
                             {% csrf_token %}
-                            {% isFollowing user follower.follower as following_this_user %}
+                            {% isFollowing user follower.follower user.is_authenticated as following_this_user %}
                             {% if following_this_user %}
                             <button class="btn btn-primary float-right" type="submit"
                               style="color: #fffffff; border: 2px solid #0085a1; width: 10rem;"
@@ -136,7 +136,7 @@ nav{
                           <div class="float-left">
                             <a href="{% url 'blogs:profile-detail' following.following.id %}"
                               class="float-left">{{following.following}}</a><br>
-                            {% isFollowing following.following user as is_following %}
+                            {% isFollowing following.following user user.is_authenticated as is_following %}
                             {% if is_following %}
                             <div class="float-left">
                               <span class="badge badge-dark" style="opacity: .75; font-size: 65%;">Follows You</span>
@@ -146,7 +146,7 @@ nav{
                           <form action="{% url 'blogs:follow' following.following.pk %}" method="POST"
                             id="follow-form-{{following.following.pk}}-following">
                             {% csrf_token %}
-                            {% isFollowing user following.following as following_this_user %}
+                            {% isFollowing user following.following user.is_authenticated as following_this_user %}
                             {% if following_this_user %}
                             <button class="btn btn-primary float-right" type="submit"
                               style="color: #fffffff; border: 2px solid #0085a1; width: 10rem;"

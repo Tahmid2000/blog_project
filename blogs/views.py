@@ -303,7 +303,10 @@ class ProfileDetail(UserPassesTestMixin, generic.ListView):
         return self.request.user != User.objects.filter(pk=self.kwargs['pk']).first()
 
     def handle_no_permission(self):
-        return redirect('blogs:profile', self.request.user.pk)
+        if self.request.user.is_authenticated:
+            return redirect('blogs:profile', self.request.user.pk)
+        else:
+            return redirect('blogs:home')
     paginate_by = 5
     template_name = 'profiles/profile_detail.html'
     context_object_name = 'all_blogs'
@@ -369,15 +372,3 @@ def follow(request, *args, **kwargs):
             notif.save()
             response_data['status'] = 1
     return JsonResponse(response_data)
-
-
-""" @method_decorator(login_required, name='dispatch')
-class ProfileDelete(UserPassesTestMixin, generic.edit.DeleteView):
-    def test_func(self):
-        return self.request.user == self.get_object().created_by
-
-    def handle_no_permission(self):
-        return redirect('blogs:profile')
-    model = UserProfileInfo
-    template_name = 'profiles/profile_delete.html'
-    success_url = reverse_lazy('blogs:profile') """

@@ -148,7 +148,7 @@ color: white;
                                 {{the_user}}
                             </h2>
                         </a>
-                        {% isFollowing the_user user as is_following %}
+                        {% isFollowing the_user user user.is_authenticated as is_following %}
                         {% if is_following %}
                         <div style="margin-top: -10px;">
                             <div class="d-flex justify-content-center">
