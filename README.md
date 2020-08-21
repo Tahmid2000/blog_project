@@ -1,4 +1,4 @@
-# blogsforall
+# Blogs For All
 Initially, this might just seem like a blogging website, but there is so much more to it than that.
 Blogs For All evolved from a blog site to a social media site where you can like and comment on
 your favorite posts and even give a follow to your favorite creators. The algorithm implemented will
